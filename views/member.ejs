@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>IO MEMBERS</title>
+    <link rel="stylesheet" href="../public/style.css"
+</head>
+
+<body>
+    <h1> IO Members! </h1>
+    <table>
+        <tr>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>닉네임</th>
+            <th>전화번호</th>
+            <th>역할</th>
+        </tr>
+        <% for(var i = 0; i < members.length; i++) { %>
+            <tr>
+                <td> <%= members[i].id %></td>
+                <td><%= members[i].name %></td>
+                <td><%= members[i].email %></td>
+                <td><%= members[i].nickname %></td>
+                <td><%= members[i].phone %></td>
+                <td><%= members[i].position %></td>
+            </tr>
+        <% } %>
+    </table>
+</body>
+
+</html>
