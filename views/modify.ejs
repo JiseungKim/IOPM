@@ -3,14 +3,14 @@
 
 <head>
     <meta charset="utf-8">
-    <title>IO MEMBERS</title>
+    <title>Modify your Information</title>
 </head>
 
 <body>
-    <h1> Join with IO Members! </h1>
-    <form action="/member/signup" method="POST">
+    <h1> Modify your information </h1>
+    <form action="/member/modify" method="PUT">
         <label for="email">E-MAIL</label>
-        <input name="email" type="email" required />
+        <input name="email" type="email" value="<%= member.email %>" required />
         <label for="password">PASSWORD</label>
         <input name="password" type="password" required />
         <label for="name">NAME</label>
@@ -22,7 +22,7 @@
         <label for="phone">PHONE</label>
         <input name="phone" type="text" required />
         <label for="photo">PHOTO</label>
-        <input name="photo" type="text"/>
+        <input name="photo" type="text" required />
         <button class="btn">SIGNUP!</button>
     </form>
 </body>

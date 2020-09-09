@@ -16,7 +16,7 @@
             <th>이메일</th>
             <th>닉네임</th>
             <th>전화번호</th>
-            <th>역할</th>
+            <th>성별</th>
         </tr>
         <% for(var i = 0; i < members.length; i++) { %>
             <tr>
@@ -25,7 +25,7 @@
                 <td><%= members[i].email %></td>
                 <td><%= members[i].nickname %></td>
                 <td><%= members[i].phone %></td>
-                <td><%= members[i].position %></td>
+                <td><%= members[i].gender %></td>
             </tr>
         <% } %>
     </table>
