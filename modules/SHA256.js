@@ -104,9 +104,6 @@ module.exports = function SHA256(s){
 
     }
 
- 
-
-
     function str2binb (str) {
 
         var bin = Array();

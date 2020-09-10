@@ -9,23 +9,24 @@ class Member {
     }
 
     async check_email(email) {
-        const connection = await this._pool.getConnection()
-        
+        const connection = null
+
         try {
-            const [row] = await connection.query(`SELECT * FROM member WHERE email='${email}'`)
-            return row.length
+            connection = await this._pool.getConnection()
+            const [rows] = await connection.query(`SELECT * FROM member WHERE email='${email}'`)
+            return rows.length
         } catch (err) {
             throw err
         } finally {
             connection.release()
         }
-
     }
 
     async check_nickname(nickname) {
-        const connection = await this._pool.getConnection()
+        const connection = null
 
         try {
+            connection = await this._pool.getConnection()
             const [rows] = await connection.query(`SELECT * FROM member WHERE nickname='${nickname}'`)
             return rows.length
         } catch (err) {
@@ -35,22 +36,13 @@ class Member {
         }
 
     }
-    async update_last_login(mid) {
-        const connection = await this._pool.getConnection()
-
-        try {
-            await connection.query(`UPDATE member SET last_login=now() WHERE id=${mid}`)
-        } catch(err) {
-            throw err
-        } finally {
-            connection.release()
-        }
-    }
+    
 
     async get(mid) {
-        const connection = await this._pool.getConnection()
+        const connection = null
 
         try {
+            connection = await this._pool.getConnection()
             const [rows] = await connection.query(`SELECT * FROM member WHERE id=${mid}`)
             return rows[0]
         } catch (err) {
@@ -61,9 +53,10 @@ class Member {
     }
 
     async get_all() {
-        const connection = await this._pool.getConnection()
+        const connection = null
 
         try {
+            connection = await this._pool.getConnection()
             const [rows] = await connection.query(`SELECT * FROM member`)
             return rows
         } catch (err) {
@@ -74,10 +67,11 @@ class Member {
     }
 
     async insert(member) {
-        const connection = await this._pool.getConnection()
-        const code = sha256(member.password)
+        const code = sha26(member.password)
+        const connection = null
 
         try {
+            connection = await this._pool.getConnection()
             const [result] = await connection.query(
                 `INSERT INTO member(email,password,name,nickname,gender,phone,photo)
                 VALUES('${member.email}','${code}','${member.name}','${member.nickname}','${member.gender}','${member.phone}','${member.photo}')`
@@ -91,9 +85,10 @@ class Member {
     }
 
     async update(member) {
-        const connection = await this._pool.getConnection()
+        const connection = null
 
         try {
+            connection = await this._pool.getConnection()
             await connection.query(
                 `UPDATE member SET
                 nickname='${member.nickname}',photo='${member.photo}',phone='${member.phone}'
@@ -109,9 +104,10 @@ class Member {
     }
 
     async remove(mid) {
-        const connection = await this._pool.getConnection()
+        const connection = null
 
         try {
+            connection = await this._pool.getConnection()
             await connection.query(`DELETE FROM member WHERE id=${mid}`)
         } catch (err) {
             throw err
@@ -120,6 +116,23 @@ class Member {
         }
     }
     
+    async update_last_login(member) {
+        const code = sha256(member.pssword)
+        const connection = null
+
+        try {
+            connection = await this._pool.getConnection()
+            const [rows] = await connection.query(`SELECT * FROM member WHERE email='${member.email}' and '${code}`)
+            if(rows.length > 0) {
+                connection.query(`UPDATE member SET last_login=now() WHERE id=${mid}`)
+            }
+            return member.email
+        } catch(err) {
+            throw err
+        } finally {
+            connection.release()
+        }
+    }
 }
 
 module.exports = Member
