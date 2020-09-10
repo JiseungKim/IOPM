@@ -13,7 +13,7 @@ app.get('/', function(req, res) {
 })
 
 app.use('/member', require('./routers/member'))
-app.use('/api.member', require('./routers/api.member'))
+app.use('/api/member', require('./routers/api.member'))
 
 app.listen(3000, ()=> {
     console.log("listen to 3000..")

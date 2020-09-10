@@ -6,50 +6,88 @@ const Member = require('../models/member')
 const member = new Member()
 
 router.get('/all',async_handler(async(req, res, next)=> {
-    const members = await member.get_all()
-    res.json(members)
-}))
-
-router.get('/get/:id', async_handler(async(req, res, next) => {
-    const mem = await member.get(req.params.id)
-    res.json(mem)
-}))
-
-router.post('/signup', async_handler(async(req, res, next) => {
-    
     try {
-        await member.insert({
-            email: req.body.email,
-            password: req.body.password,
-            name: req.body.name,
-            nickname: req.body.nickname,
-            gender: req.body.gender,
-            phone: req.body.phone,
-            photo: req.body.photo
-        })
-
+        const members = await member.get_all()
+        res.json(members)
     } catch (err) {
-        
-    } finally {
-        
+        console.log(err)
+        res.json({ success:false, error:err})
     }
 }))
 
-router.put('/modify/:id', async_handler(async(req, res, next) => {
-    await member.update({
-        id: req.params.id,
-        // _email: req.body.email,
-        // _name: req.body.name,
-        nickname: req.body.nickname,
-        // _gender: req.body.gender,
-        phone: req.body._phone,
-        photo: req.body.photo
-    })
+router.get('/get/:id', async_handler(async(req, res, next) => {
+    try {
+        const mem = await member.get(req.params.id)
+        res.json({ success:true, member:mem})
+    } catch (err) {
+        console.log(err)
+        res.json({ success:false, error:err })
+    }
 }))
 
-router.delete('/delete/:id', async_handler(async(req, res, next) => {
-    await member.delete(req.params.id)
+router.post('/signup', async_handler(async(req, res, next) => {
+    try {
+        const id = await member.insert(req.body)
+
+        res.json({ success:true, id:id })
+    } catch (err) {
+        console.log(err)
+        res.json({ success:false, error:err })
+    }
 }))
 
+router.put('/modify', async_handler(async(req, res, next) => {
+    try {
+        
+        await member.update(req.body)
+
+        res.json({ success:true, id:req.body.id })
+
+    } catch (err) {
+        console.log(err)
+        res.json({ success:false, error:err })
+    }
+}))
+
+router.delete('/remove/:id', async_handler(async(req, res, next) => {
+    try {
+        await member.remove(req.params.id)
+    } catch (err) {
+        console.log(err)
+        res.json({ success:false, error:err })
+    }
+}))
+
+router.get('/check_email/:email', async_handler(async(req,res,next) => {
+    try {
+        const count = await member.check_email(req.params.email)
+
+        if(count > 0) {
+            res.json({ success:true, available: false})
+        } else {
+            res.json({ success:true, available: true})
+        }
+        
+    } catch (err) {
+        console.log(err)
+        res.json({ success:false, error:err})
+    }
+}))
+
+router.get('/check_nickname/:nickname', async_handler(async(req,res,next) => {
+    try {
+        const count = await member.check_nickname(req.params.nickname)
+
+        if(count > 0) {
+            res.json({ success:true, available: false})
+        } else {
+            res.json({ success:true, available: true})
+        }
+    
+    } catch (err) {
+        console.log(err)
+        res.json({ success:false, error:err})
+    }
+}))
 
 module.exports = router
