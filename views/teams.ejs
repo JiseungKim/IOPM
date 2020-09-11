@@ -10,22 +10,7 @@
 </head>
 
 <body>
-    <div id="header">
-        <div class="title">
-            <img class="logo" src="image/icon.png" />
-            <div>
-                <div class="project-name">IOPM</div>
-                <div class="project-desc">Project Management tool made by Insider & Outsider</div>
-            </div>
-        </div>
-        <ul class="navi-list">
-            <li class="navi-item">Home</li>
-            <li class="navi-item">Home</li>
-            <li class="navi-item">Home</li>
-            <li class="navi-item">Home</li>
-            <li class="navi-item">Home</li>
-        </ul>
-    </div>
+    <%- include('partition/header') %>
     <div id="contents">
         <ul id="teams" class="team-card-list">
             <li class="team-card-item" v-for="team in teams">
@@ -39,7 +24,7 @@
             </li>
         </ul>
     </div>
-    <div id="footer">Footer</div>
+    <%- include('partition/footer') %>
     <script src="js/teams.js"></script>
 </body>
 
