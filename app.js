@@ -1,10 +1,13 @@
 const express = require('express')
 const async_handler = require('express-async-handler')
+const appsettings = require('./modules/config')
 
 const app = express()
 app.set('view engine', 'ejs')
 app.use(express.static('./public'))
 app.use(express.json())
+
+app.locals.cdn = require('./modules/cdn')
 
 app.get('/', async_handler(async (req, res, next) => {
     res.render('start', { title: 'jiseung', content: '핵고수가되자' })
@@ -20,6 +23,7 @@ app.get('/', async_handler(async (req, res, next) => {
     res.render('home', { data: { title: 'cshyeon' } })
 }))
 
-app.listen(3000, () => {
-    console.log("listen to 3000..")
+app.listen(appsettings.common.port, () => {
+    console.log(`listen to ${appsettings.common.port}..`)
+})
 })
