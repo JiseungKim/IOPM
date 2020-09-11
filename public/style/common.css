@@ -24,7 +24,13 @@ ul
 	justify-content: space-between;
 	margin: 0px auto;
 	max-width: 1280px;
-}
+	position: fixed;
+	top: 0px;
+	min-width: 100%;
+	background-color: white;
+	border-bottom: 1px #c0c0c0 solid;
+	padding-bottom: 20px;
+}  
 
 #header .title
 {
@@ -70,6 +76,6 @@ ul
 
 #contents
 {
-	max-width: 1024px;
 	margin: 0px auto;
+	padding-top: 150px;
 }

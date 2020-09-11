@@ -11,9 +11,26 @@
 
 <body>
     <%- include('partition/header') %>
-    <div id="contents"></div>
-    <%- include('partition/footer') %>
-    <script src="js/team.js"></script>
+    <div id="contents">
+        <ul id="sections" class="section-list">
+            <li class="section-item" v-for="section in sections">
+                <div class="title">{{ section.title }}</div>
+                <ul class="todo-list">
+                    <li class="todo-item" v-for="todo in section.todo_list">
+                        <div class="title">{{ todo.title }}</div>
+                        <div class="desc">{{ todo.desc }}</div>
+                        <div class="responsibility">
+                            <img class="thumb" src=<%= cdn("image/tyrion.png") %> />
+                            <div class="member-desc">
+                                <div class="name">{{ todo.owner.name }}</div>
+                                <div class="desc">{{ todo.owner.desc }}</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+    </div>
+    <script src=<%= cdn("js/team.js") %>></script>
 </body>
 
 </html>

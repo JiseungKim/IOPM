@@ -1,0 +1,71 @@
+#contents
+{
+    text-align: center;
+}
+
+.section-list {
+    display: block;
+    white-space: nowrap;
+}
+
+.section-list .section-item {
+    width: 20%;
+    display: inline-table;
+    margin: 0% 1%;
+    white-space: normal;
+}
+
+.section-list .section-item > .title {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.todo-list {
+    width: 100%;
+}
+
+.todo-list .todo-item {
+    display: inline-block;
+    border: 1px #c0c0c0 solid;
+    margin: 5px 0px;
+    padding: 15px 10px;
+    border-radius: 10px;
+    text-align: initial;
+}
+
+.todo-list .todo-item .title
+{
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.todo-list .todo-item .responsibility
+{
+    display: flex;
+    margin-top: 15px;
+}
+
+.todo-list .todo-item .responsibility .thumb
+{
+    width: 64px;
+    border-radius: 32px;
+    margin-right: 12px;
+}
+
+.todo-list .todo-item .responsibility .member-desc {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+}
+
+.todo-list .todo-item .responsibility .member-desc .name
+{
+    font-style: italic;
+}
+
+.todo-list .todo-item .responsibility .member-desc .desc
+{
+    font-size: 13px;
+    color: #c0c0c0;
+}
