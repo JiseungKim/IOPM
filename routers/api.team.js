@@ -52,14 +52,11 @@ router.get('/find_by_mid/:mid', async_handler(async(req, res, next) => {
 router.post('/make', async_handler(async(req, res, next) => {
     try {
         
-        const tid = await team.add(req.body.team, req.body.member_id)
-
-        if(tid == null)
-            throw "팀 이름이 중복됩니다"
+        const tid = await team.add(req.body)
 
         const pid = await participation.add({
             team_id:tid,
-            member_id:req.body.member_id
+            member_id:req.body.owner
         })
 
         res.json({ success:true, team_id:tid, participation_id:pid})
@@ -69,10 +66,10 @@ router.post('/make', async_handler(async(req, res, next) => {
     }
 }))
 
-router.put('/update', async_handler(async(req, res, next) => {
+router.put('/modify', async_handler(async(req, res, next) => {
     try {
-        const success = await team.update(req.body.mid, req.body.team)
-        res.json({ success:success })
+        await team.modify(req.body.mid, req.body.team)
+        res.json({ success:true, team_id:req.body.team.id })
     } catch (err) {
         console.log(err)
         res.json({ success:false, error:err })
@@ -81,8 +78,8 @@ router.put('/update', async_handler(async(req, res, next) => {
 
 router.delete('/remove/:id', async_handler(async(req, res, next) => {
     try {
-        const success = await team.remove(req.params.id, req.body.mid)
-        res.json({ success:success })
+        await team.remove(req.params.id, req.body.mid)
+        res.json({ success:true, team_id:req.params.id })
     } catch (err) {
         console.log(err)
         res.json({ success:false, error:err })

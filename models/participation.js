@@ -1,6 +1,6 @@
 
 const mysql = require('mysql2/promise')
-const config = require('../modules/config')
+const config = require('../configs/configs.json')
 
 class Participation {
     constructor() {
@@ -15,7 +15,7 @@ class Participation {
 
             const [rows] = await connection.query(`SELECT * FROM team`)
 
-            if (rows.length == 0)
+            if(rows.length == 0)
                 throw "팀이 없습니다."
 
             return rows
@@ -35,9 +35,9 @@ class Participation {
                 `SELECT * FROM participation WHERE team_id=${participation.team_id} AND member_id=${participation.member_id}`
             )
 
-            if (rows.length > 0)
+            if(rows.length > 0)
                 throw "이미 가입되어있는 멤버입니다."
-
+            
             const [result] = await connection.query(
                 `INSERT INTO participation(team_id,member_id) VALUES(${participation.team_id}, ${participation.member_id})`
             )
@@ -53,7 +53,7 @@ class Participation {
         let connection = await this._pool.getConnection()
         // TODO:
     }
-
+    
 }
 
 module.exports = Participation
