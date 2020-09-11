@@ -11,21 +11,23 @@ class Member {
     }
 
     async update_last_login(mid) {
-        const connection = await this._pool.getConnection()
+        let connection = null
 
         try {
+            connection = await this._pool.getConnection()
             await connection.query(`UPDATE member SET last_login=now() WHERE id=${mid}`)
         } catch(err) {
             throw err
         } finally {
-            connection.release()
+            connection?.release()
         }
     }
 
     async find(mid) {
-        const connection = await this._pool.getConnection()
+        let connection = null
 
         try {
+            connection = await this._pool.getConnection()
             const [rows] = await connection.query(`SELECT * FROM member WHERE id=${mid}`)
 
             if(rows.length == 0)
@@ -35,14 +37,15 @@ class Member {
         } catch (err) {
             throw err
         } finally {
-            connection.release()
+            connection?.release()
         }
     }
 
     async find_all() {
-        const connection = await this._pool.getConnection()
+        let connection = null
 
         try {
+            connection = await this._pool.getConnection()
             const [rows] = await connection.query(`SELECT * FROM member`)
 
             if(rows.length == 0)
@@ -52,7 +55,7 @@ class Member {
         } catch (err) {
             throw err
         } finally {
-            connection.release()
+            connection?.release()
         }
     }
 
@@ -60,32 +63,34 @@ class Member {
         // TODO: 정규식!!
         const emailCheck = /([a-z0-9_\ .-]+)@([/da-z\ .-]+)\ .([a-z\ .]{2,6})/
 
-        for(var i = 0; i < rows.length; i++) {
-            if(rows[i].email == member.email)
+        for(let row of rows) {
+            if(row.email == member.email)
                 throw "중복된 이메일입니다."
-            if(rows[i].nickname == member.nickname)
+            if(row.nickname == member.nickname)
                 throw "중복된 닉네임입니다."
-            if(rows[i].phone == member.phone)
+            if(row.phone == member.phone)
                 throw "중복된 핸드폰번호입니다."
         }
     }
 
     async add(member) {
-        const connection = await this._pool.getConnection()
+        let connection = null
         const code = sha256(member.password)
         
         try {
+            connection = await this._pool.getConnection()
+
             const [rows] = await connection.query(
                 `SELECT * FROM member
                 WHERE email='${member.email}' OR nickname='${member.nickname}' OR phone='${member.phone}'`
             )
 
-            for(var i = 0; i < rows.length; i++) {
-                if(rows[i].email == member.email)
+            for(let row of rows) {
+                if(row.email == member.email)
                     throw "중복된 이메일입니다."
-                if(rows[i].nickname == member.nickname)
+                if(row.nickname == member.nickname)
                     throw "중복된 닉네임입니다."
-                if(rows[i].phone == member.phone)
+                if(row.phone == member.phone)
                     throw "중복된 핸드폰번호입니다."
             }
 
@@ -97,23 +102,25 @@ class Member {
         } catch (err) {
             throw err
         } finally {
-            connection.release()
+            connection?.release()
         }
     }
 
     async modify(member) {
-        const connection = await this._pool.getConnection()
+        let connection = null
 
         try {
+            connection = await this._pool.getConnection()
+            
             const [rows] = await connection.query(
                 `SELECT * FROM member
                 WHERE email!='${member.email}' AND (nickname='${member.nickname}' OR phone='${member.phone}')`
             )
 
-            for(var i = 0; i < rows.length; i++) {
-                if(rows[i].nickname == member.nickname)
+            for(let row of rows) {
+                if(row.nickname == member.nickname)
                     throw "중복된 닉네임입니다."
-                if(rows[i].phone == member.phone)
+                if(row.phone == member.phone)
                     throw "중복된 핸드폰번호입니다."
             }
 
@@ -126,20 +133,21 @@ class Member {
         } catch (err) {
             throw err
         } finally {
-            connection.release()
+            connection?.release()
         }
 
     }
 
     async remove(mid) {
-        const connection = await this._pool.getConnection()
+        let connection = null
 
         try {
+            connection = await this._pool.getConnection()
             await connection.query(`DELETE FROM member WHERE id=${mid}`)
         } catch (err) {
             throw err
         } finally {
-            connection.release()
+            connection?.release()
         }
     }
     

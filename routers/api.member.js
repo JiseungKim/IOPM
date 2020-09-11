@@ -8,7 +8,7 @@ const member = new Member()
 router.get('/all',async_handler(async(req, res, next)=> {
     try {
         const members = await member.find_all()
-        res.json(members)
+        res.json({ success:true, members:members})
     } catch (err) {
         console.log(err)
         res.json({ success:false, error:err})
