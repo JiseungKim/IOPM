@@ -7,7 +7,7 @@ const member = new Member()
 
 router.get('/all',async_handler(async(req, res, next)=> {
     try {
-        const members = await member.get_all()
+        const members = await member.find_all()
         res.json(members)
     } catch (err) {
         console.log(err)
@@ -15,9 +15,9 @@ router.get('/all',async_handler(async(req, res, next)=> {
     }
 }))
 
-router.get('/get/:id', async_handler(async(req, res, next) => {
+router.get('/find/:id', async_handler(async(req, res, next) => {
     try {
-        const mem = await member.get(req.params.id)
+        const mem = await member.find(req.params.id)
         res.json({ success:true, member:mem})
     } catch (err) {
         console.log(err)
@@ -27,7 +27,7 @@ router.get('/get/:id', async_handler(async(req, res, next) => {
 
 router.post('/signup', async_handler(async(req, res, next) => {
     try {
-        const id = await member.insert(req.body)
+        const id = await member.add(req.body)
 
         res.json({ success:true, id:id })
     } catch (err) {
@@ -39,7 +39,7 @@ router.post('/signup', async_handler(async(req, res, next) => {
 router.put('/modify', async_handler(async(req, res, next) => {
     try {
         
-        await member.update(req.body)
+        await member.modify(req.body)
 
         res.json({ success:true, id:req.body.id })
 
@@ -55,38 +55,6 @@ router.delete('/remove/:id', async_handler(async(req, res, next) => {
     } catch (err) {
         console.log(err)
         res.json({ success:false, error:err })
-    }
-}))
-
-router.get('/check_email/:email', async_handler(async(req,res,next) => {
-    try {
-        const count = await member.check_email(req.params.email)
-
-        if(count > 0) {
-            res.json({ success:true, available: false})
-        } else {
-            res.json({ success:true, available: true})
-        }
-        
-    } catch (err) {
-        console.log(err)
-        res.json({ success:false, error:err})
-    }
-}))
-
-router.get('/check_nickname/:nickname', async_handler(async(req,res,next) => {
-    try {
-        const count = await member.check_nickname(req.params.nickname)
-
-        if(count > 0) {
-            res.json({ success:true, available: false})
-        } else {
-            res.json({ success:true, available: true})
-        }
-    
-    } catch (err) {
-        console.log(err)
-        res.json({ success:false, error:err})
     }
 }))
 
