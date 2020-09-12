@@ -1,6 +1,6 @@
 
 const mysql = require('mysql2/promise')
-const config = require('../configs/configs.json')
+const config = require('../modules/config')
 const sha256 = require('../modules/SHA256')
 // 팀이름 공백, 영문, 한글, 숫자, _ , -만 가능하게 검사하기
 // SQL injection!

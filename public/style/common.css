@@ -30,6 +30,7 @@ ul
 	background-color: white;
 	border-bottom: 1px #c0c0c0 solid;
 	padding-bottom: 20px;
+	z-index: 1000;
 }  
 
 #header .title

@@ -1,6 +1,6 @@
 
 const mysql = require('mysql2/promise')
-const config = require('../configs/configs.json')
+const config = require('../modules/config')
 // TODO: 팀이름 공백, 영문, 한글, 숫자, _ , -만 가능하게 검사하기
 // SQL injection!
 
@@ -46,7 +46,7 @@ class Team {
     }
 
     async find_by_owner(owner) {
-        
+
         let connection = null
 
         try {
@@ -97,7 +97,7 @@ class Team {
 
             if (exists[0].count > 0)
                 return false
-            
+
             const [result] = await this._pool.query(`UPDATE team SET name='${team.name}',owner='${team.owner}' WHERE id=${team.id}`)
 
             return result.affectedRows > 0

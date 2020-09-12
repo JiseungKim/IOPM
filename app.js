@@ -26,4 +26,3 @@ app.get('/', async_handler(async (req, res, next) => {
 app.listen(appsettings.common.port, () => {
     console.log(`listen to ${appsettings.common.port}..`)
 })
-})
