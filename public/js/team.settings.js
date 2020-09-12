@@ -1,6 +1,7 @@
 new Vue({
     el: '#contents',
     data: {
+        page: 'members',
         team: {
             name: 'IOPM',
             desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
@@ -86,6 +87,29 @@ new Vue({
                 name: 'Tyrion Lannister',
                 email: 'boyism80@gmail.com'
             }
+        ],
+        sections: [
+            {
+                name: 'Tyrion Lannister',
+                desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+            },
+            {
+                name: 'Tyrion Lannister',
+                desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+            },
+            {
+                name: 'Tyrion Lannister',
+                desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+            },
+            {
+                name: 'Tyrion Lannister',
+                desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+            }
         ]
     },
+    methods: {
+        tab: function (value) {
+            this.page = value
+        }
+    }
 })

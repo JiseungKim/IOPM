@@ -14,8 +14,8 @@ router.get('/:name', async_handler(async (req, res, next) => {
     res.render('team')
 }))
 
-router.get('/:name/members', async_handler(async (req, res, next) => {
-    res.render('members')
+router.get('/:name/settings', async_handler(async (req, res, next) => {
+    res.render('team_settings')
 }))
 
 module.exports = router

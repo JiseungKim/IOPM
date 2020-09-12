@@ -25,11 +25,39 @@ img.team-icon
     font-weight: bold;
 }
 
-
-.member-container
+.team-contents
 {
     margin: 0px auto;
     width: 1024px;
+    display: flex;
+    justify-content: center;
+}
+
+.tab-navi
+{
+    width: 224px;
+}
+
+.tab-navi-list
+{
+    margin: 10px 20px;
+}
+
+.tab-navi-item
+{
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.tab-navi-item[active]
+{
+    background-color: #dfe1e6;
+}
+
+.containers
+{
+    width: 800px;
 }
 
 .member-container .member-group
@@ -75,5 +103,26 @@ img.team-icon
 .member-list .member-item .member-detail .email
 {
     font-size: 12px;
+    color: #c0c0c0;
+}
+
+.section-list
+{}
+
+.section-list .section-item
+{
+    border: 1px #c0c0c0 solid;
+    margin: 10px 0px;
+    padding: 11px;
+}
+
+.section-list .section-item .name
+{
+    font-weight: bold;
+}
+
+.section-list .section-item .desc
+{
+    font-size: 14px;
     color: #c0c0c0;
 }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Members</title>
+    <%- include('partition/dependency') %>
+    <link rel="stylesheet" href=<%= cdn("style/team.settings.css") %>>
+</head>
+
+<body>
+    <%- include('partition/header') %>
+    <div id="contents">
+        <div class="team-header">
+            <div class="team-header-contents">
+                <img class="team-icon" src=<%= cdn("image/tyrion.png") %> />
+                <div class="team-detail">
+                    <div class="team-name">{{ team.name }}</div>
+                    <span class="team-desc">{{ team.desc }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="team-contents">
+            <div class="tab-navi">
+                <ul class="tab-navi-list">
+                    <li class="tab-navi-item" v-bind:active="page=='members'" v-on:click="tab('members')">
+                        Members</li>
+                    <li class="tab-navi-item" v-bind:active="page=='sections'" v-on:click="tab('sections')">
+                        Sections</li>
+                </ul>
+            </div>
+            <div class="containers">
+                <div class="member-container" v-show='page == "members"'>
+                    <div class="member-group">
+                        <div class="title">Lorem ipsum</div>
+                        <div class="desc">Lorem ipsum dolor sit amet</div>
+                        <ul class="member-list">
+                            <li class="member-item" data-aos="fade-up" v-for="member in members">
+                                <img class="member-icon" src=<%= cdn("image/tyrion.png") %> />
+                                <div class="member-detail">
+                                    <div class="name">{{ member.name }}</div>
+                                    <div class="email">{{ member.email }}</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="section-container" v-show='page == "sections"'>
+                    <ul class="section-list">
+                        <li class="section-item" data-aos="fade-up" v-for="section in sections">
+                            <div class="name">{{ section.name }}</div>
+                            <div class="desc">{{ section.desc }}</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src=<%= cdn("js/team.settings.js") %>></script>
+</body>
+
+</html>
