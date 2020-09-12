@@ -4,10 +4,39 @@
 <head>
     <meta charset="utf-8">
     <title>Members</title>
+    <%- include('partition/dependency') %>
+    <link rel="stylesheet" href=<%= cdn("style/team.members.css") %>>
 </head>
 
 <body>
-    <h1>Members</h1>
+    <%- include('partition/header') %>
+    <div id="contents">
+        <div class="team-header">
+            <div class="team-header-contents">
+                <img class="team-icon" src=<%= cdn("image/tyrion.png") %> />
+                <div class="team-detail">
+                    <div class="team-name">{{ team.name }}</div>
+                    <span class="team-desc">{{ team.desc }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="member-container">
+            <div class="member-group">
+                <div class="title">Lorem ipsum</div>
+                <div class="desc">Lorem ipsum dolor sit amet</div>
+                <ul class="member-list">
+                    <li class="member-item" v-for="member in members">
+                        <img class="member-icon" src=<%= cdn("image/tyrion.png") %> />
+                        <div class="member-detail">
+                            <div class="name">{{ member.name }}</div>
+                            <div class="email">{{ member.email }}</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src=<%= cdn("js/team.members.js") %>></script>
 </body>
 
 </html>
