@@ -16,8 +16,15 @@
                     <div id="modal-1-title" class="title">Confirm</div>
                 </div>
                 <div id="modal-1-content" class="contents">
-                    <div>Are you sure you want to delete this fie?</div>
-                    <div>You can't undo this action.</div>
+                    <div class="message">
+                        <div class="icon">
+                            <img src=<%= cdn("image/warning.png") %> />
+                        </div>
+                        <div>
+                            <div>Are you sure you want to delete this fie?</div>
+                            <div>You can't undo this action.</div>
+                        </div>
+                    </div>
                     <div class="buttons">
                         <button class="no" data-micromodal-close>NO</button>
                         <button class="yes">YES</button>
