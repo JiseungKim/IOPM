@@ -80,3 +80,63 @@ ul
 	margin: 0px auto;
 	padding-top: 115px;
 }
+
+.dialog
+{
+	display: none;
+}
+
+.dialog.opened
+{
+	display: block;
+}
+
+.dialog > .background
+{
+	position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    min-height: 100%;
+    z-index: 10000;
+    align-items: center;
+	background-color: #88888888;
+	display: flex;
+	justify-content: center;;
+}
+
+.dialog .caption
+{
+	color: white;
+    background-color: black;
+    padding: 10px 20px;
+}
+
+.dialog .contents
+{
+	background-color: white;
+    color: #a0a0a0;
+	padding: 30px 25px;
+	min-width: 380px;
+}
+
+.dialog .contents .buttons
+{
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 20px;
+}
+
+.dialog .contents .buttons > button
+{
+	background-color: white;
+	border: none;
+    outline: 1px #c0c0c0 solid;
+    padding: 5px 10px;
+    margin-left: 10px;
+}
+
+.dialog .contents .buttons > button:focus
+{
+	outline: 1px black solid;
+}

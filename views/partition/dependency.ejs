@@ -1,7 +1,21 @@
 <script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <link rel="stylesheet" href=<%= cdn("style/common.css") %>>
 <script>
-    window.onload = () => AOS.init();
+    window.onload = () => {
+        AOS.init()
+        MicroModal.init({
+            // onShow: modal => console.info(`${modal.id} is shown`),
+            // onClose: modal => console.info(`${modal.id} is hidden`),
+            openTrigger: 'data-custom-open',
+            openClass: 'opened',
+            disableScroll: true,
+            disableFocus: false,
+            awaitOpenAnimation: false,
+            awaitCloseAnimation: false,
+            debugMode: true
+        });
+    }
 </script>
