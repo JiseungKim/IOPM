@@ -14,6 +14,9 @@
         <ul id="sections" class="section-list">
             <li class="section-item" v-for="section in sections">
                 <div class="title">{{ section.title }}</div>
+                <div class="new-todo">
+                    <img src=<%= cdn("image/plus.png") %> />
+                </div>
                 <ul class="todo-list">
                     <li class="todo-item" data-aos="flip-up" v-for="todo in section.todo_list">
                         <div class="title">{{ todo.title }}</div>
@@ -28,6 +31,7 @@
                     </li>
                 </ul>
             </li>
+        </ul>
     </div>
     <script src=<%= cdn("js/team.js") %>></script>
 </body>

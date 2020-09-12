@@ -20,6 +20,19 @@
     font-size: 20px;
 }
 
+.section-list .section-item > .new-todo {
+    border: 1px #c0c0c0 solid;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.section-list .section-item > .new-todo > img
+{
+    margin: 5px;
+}
+
 .todo-list {
     width: 100%;
 }
