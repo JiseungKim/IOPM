@@ -49,6 +49,7 @@
 .todo-list .todo-item .responsibility .thumb
 {
     width: 64px;
+    height: 64px;
     border-radius: 32px;
     margin-right: 12px;
 }

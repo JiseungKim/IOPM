@@ -4,8 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>Teams</title>
-    <script src="https://unpkg.com/vue"></script>
-    <link rel="stylesheet" href=<%= cdn("style/common.css") %>>
+    <%- include('partition/dependency') %>
     <link rel="stylesheet" href=<%= cdn("style/team.css") %>>
 </head>
 
@@ -16,7 +15,7 @@
             <li class="section-item" v-for="section in sections">
                 <div class="title">{{ section.title }}</div>
                 <ul class="todo-list">
-                    <li class="todo-item" v-for="todo in section.todo_list">
+                    <li class="todo-item" data-aos="flip-up" v-for="todo in section.todo_list">
                         <div class="title">{{ todo.title }}</div>
                         <div class="desc">{{ todo.desc }}</div>
                         <div class="responsibility">

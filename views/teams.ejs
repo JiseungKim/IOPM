@@ -4,8 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>Teams</title>
-    <script src="https://unpkg.com/vue"></script>
-    <link rel="stylesheet" href=<%= cdn("style/common.css") %>>
+    <%- include('partition/dependency') %>
     <link rel="stylesheet" href=<%= cdn("style/teams.css") %>>
 </head>
 
@@ -13,7 +12,7 @@
     <%- include('partition/header') %>
     <div id="contents">
         <ul id="teams" class="team-card-list">
-            <li class="team-card-item" v-for="team in teams">
+            <li class="team-card-item" data-aos="zoom-in" v-for="team in teams">
                 <img src="image/fingerprint.png" />
                 <div class="top">Lorem Ipsum</div>
                 <div class="bottom">
