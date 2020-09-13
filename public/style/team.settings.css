@@ -82,9 +82,14 @@ img.team-icon
 .member-list .member-item
 {
     margin-top: 5px;
-    display: flex;
     padding: 10px 5px;
     border-bottom: 1px #c0c0c0 solid;
+}
+
+.member-list .member-item .member-contents
+{
+    display: flex;
+    justify-content: space-between;
 }
 
 .member-list .member-item .member-icon
@@ -114,6 +119,12 @@ img.team-icon
     border: 1px #c0c0c0 solid;
     margin: 10px 0px;
     padding: 11px;
+}
+
+.section-list .section-item .section-contents
+{
+    display: flex;
+    justify-content: space-between;
 }
 
 .section-list .section-item .name
