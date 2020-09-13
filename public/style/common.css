@@ -5,8 +5,8 @@
 
 body
 {
-    margin: 0px;
-    font-family: proxima-nova;
+	margin: 0px;
+	font-family: proxima-nova;
 	line-height: 1.5;
 }
 
@@ -52,27 +52,27 @@ ul
 
 #header .navi-list
 {
-    list-style: none;
-    margin: 0px 0px;
-    padding: 30px 0px;
+	list-style: none;
+	margin: 0px 0px;
+	padding: 30px 0px;
 }
 
 #header .navi-list .navi-item
 {
-    display: inline-block;
-    padding: 5px 20px;
+	display: inline-block;
+	padding: 5px 20px;
 }
 
 #footer
 {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    padding: 10px 0px;
-    background-color: white;
-    text-align: center;
-    vertical-align: middle;
-    border-top: 1px #c0c0c0 solid;
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	padding: 10px 0px;
+	background-color: white;
+	text-align: center;
+	vertical-align: middle;
+	border-top: 1px #c0c0c0 solid;
 }
 
 #contents
@@ -81,79 +81,42 @@ ul
 	padding-top: 115px;
 }
 
-.dialog
-{
-	display: none;
+.modal-mask {
+	position: fixed;
+	z-index: 9998;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, .5);
+	display: table;
+	transition: opacity .3s ease;
 }
 
-.dialog.opened
-{
-	display: block;
+.modal-wrapper {
+	display: table-cell;
+	vertical-align: middle;
 }
 
-.dialog > .background
-{
-	position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    min-height: 100%;
-    z-index: 10000;
-    align-items: center;
-	background-color: #88888888;
-	display: flex;
-	justify-content: center;;
+.modal-container {
+	width: 480px;
+	margin: 0px auto;
+	background-color: #fff;
+	border-radius: 2px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+	transition: all .3s ease;
+	font-family: Helvetica, Arial, sans-serif;
 }
 
-.dialog .caption
-{
-	color: white;
-    background-color: black;
-    padding: 10px 20px;
+.modal-header h3 {
+	margin-top: 0;
+	color: #42b983;
 }
 
-.dialog .contents
-{
-	background-color: white;
-    color: #a0a0a0;
-	padding: 30px 25px;
-	min-width: 380px;
+.modal-body {
+	margin: 20px 0;
 }
 
-.dialog .contents .message
-{
-	display: flex;
-}
-
-.dialog .contents .icon
-{
-	margin-top: 8px;
-	margin-right: 15px;
-}
-
-.dialog .contents .icon > img
-{
-	width: 32px;
-	height: 32px;
-}
-
-.dialog .contents .buttons
-{
-	display: flex;
-	justify-content: flex-end;
-	margin-top: 20px;
-}
-
-.dialog .contents .buttons > button
-{
-	background-color: white;
-	border: none;
-    outline: 1px #c0c0c0 solid;
-    padding: 5px 10px;
-    margin-left: 10px;
-}
-
-.dialog .contents .buttons > button:focus
-{
-	outline: 1px black solid;
+.modal-default-button {
+	float: right;
 }

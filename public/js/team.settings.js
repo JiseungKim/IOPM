@@ -1,7 +1,8 @@
 new Vue({
     el: '#contents',
     data: {
-        page: 'members',
+        showModal: false,
+        role: 'members',
         team: {
             name: 'IOPM',
             desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
@@ -105,11 +106,31 @@ new Vue({
                 name: 'Tyrion Lannister',
                 desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
             }
-        ]
+        ],
+        dest: 'cshyeon'
     },
     methods: {
         tab: function (value) {
-            this.page = value
+            this.role = value
+        },
+        remove_member: function (member) {
+            this.dest = member.name
+            this.showModal = true
+        },
+        remove_section: function (section) {
+            this.dest = section.name
+            this.showModal = true
+        },
+        on_success: function (data) {
+            console.log(data.role)
+            if (data.role == 'members')
+                this.members.pop()
+            else if (data.role == 'sections')
+                this.sections.pop()
+            else
+                return
+
+            this.showModal = false
         }
     }
 })

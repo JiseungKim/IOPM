@@ -5,35 +5,11 @@
     <meta charset="utf-8">
     <title>Members</title>
     <%- include('partition/dependency') %>
+    <%- include('templates/dialog_confirm') %>
     <link rel="stylesheet" href=<%= cdn("style/team.settings.css") %>>
 </head>
 
 <body>
-    <div id="modal-1" class="dialog" aria-hidden="true">
-        <div class="background" tabindex="-1" data-micromodal-close>
-            <div role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
-                <div class="caption">
-                    <div id="modal-1-title" class="title">Confirm</div>
-                </div>
-                <div id="modal-1-content" class="contents">
-                    <div class="message">
-                        <div class="icon">
-                            <img src=<%= cdn("image/warning.png") %> />
-                        </div>
-                        <div>
-                            <div>Are you sure you want to delete this fie?</div>
-                            <div>You can't undo this action.</div>
-                        </div>
-                    </div>
-                    <div class="buttons">
-                        <button class="no" data-micromodal-close>NO</button>
-                        <button class="yes">YES</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <%- include('partition/header') %>
     <div id="contents">
         <div class="team-header">
@@ -48,14 +24,14 @@
         <div class="team-contents">
             <div class="tab-navi">
                 <ul class="tab-navi-list">
-                    <li class="tab-navi-item" v-bind:active="page=='members'" v-on:click="tab('members')">
+                    <li class="tab-navi-item" v-bind:active="role=='members'" v-on:click="tab('members')">
                         Members</li>
-                    <li class="tab-navi-item" v-bind:active="page=='sections'" v-on:click="tab('sections')">
+                    <li class="tab-navi-item" v-bind:active="role=='sections'" v-on:click="tab('sections')">
                         Sections</li>
                 </ul>
             </div>
             <div class="containers">
-                <div class="member-container" v-show='page == "members"'>
+                <div class="member-container" v-show='role == "members"'>
                     <div class="member-group">
                         <div class="title">Lorem ipsum</div>
                         <div class="desc">Lorem ipsum dolor sit amet</div>
@@ -70,15 +46,17 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <img src=<%= cdn("image/recycle_bin.png") %> />
-                                        <img src=<%= cdn("image/recycle_bin.png") %> />
+                                        <img class="icon" v-on:click="remove_member(member)"
+                                            src=<%= cdn("image/recycle_bin.png") %> />
+                                        <img class="icon" v-on:click="remove_member(member)"
+                                            src=<%= cdn("image/recycle_bin.png") %> />
                                     </div>
                                 </div>
                             </li>
                         </ul>
                     </div>
                 </div>
-                <div class="section-container" v-show='page == "sections"'>
+                <div class="section-container" v-show='role == "sections"'>
                     <ul class="section-list">
                         <li class="section-item" data-aos="fade-up" v-for="section in sections">
                             <div class="section-contents">
@@ -87,8 +65,10 @@
                                     <div class="desc">{{ section.desc }}</div>
                                 </div>
                                 <div>
-                                    <img class="member-icon" src=<%= cdn("image/recycle_bin.png") %> />
-                                    <img class="member-icon" src=<%= cdn("image/recycle_bin.png") %> />
+                                    <img class="icon" v-on:click="remove_section(section)"
+                                        src=<%= cdn("image/recycle_bin.png") %> />
+                                    <img class="icon" v-on:click="remove_section(section)"
+                                        src=<%= cdn("image/recycle_bin.png") %> />
                                 </div>
                             </div>
                         </li>
@@ -96,8 +76,8 @@
                 </div>
             </div>
         </div>
+        <confirm v-bind:role='role' v-bind:dest='dest' v-if="showModal" @close="showModal=false" v-on:ok="on_success" />
     </div>
-    <button data-custom-open='modal-1'>open</button>
     <script src=<%= cdn("js/team.settings.js") %>></script>
 </body>
 
