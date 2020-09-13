@@ -32,31 +32,38 @@
             </div>
             <div class="containers">
                 <div class="member-container" v-show='role == "members"'>
-                    <div class="member-group">
-                        <div class="title">Lorem ipsum</div>
-                        <div class="desc">Lorem ipsum dolor sit amet</div>
-                        <ul class="member-list">
-                            <li class="member-item" data-aos="fade-up" v-for="member in members">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <div style="display: flex;">
-                                        <img class="member-icon" src=<%= cdn("image/tyrion.png") %> />
-                                        <div class="member-detail">
-                                            <div class="name">{{ member.name }}</div>
-                                            <div class="email">{{ member.email }}</div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <img class="icon" v-on:click="remove_member(member)"
-                                            src=<%= cdn("image/recycle_bin.png") %> />
-                                        <img class="icon" v-on:click="remove_member(member)"
-                                            src=<%= cdn("image/recycle_bin.png") %> />
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <div class="title">Lorem ipsum</div>
+                            <div class="desc">Lorem ipsum dolor sit amet</div>
+                        </div>
+                        <div class="button">Invite</div>
+                    </div>
+                    <ul class="member-list">
+                        <li class="member-item" data-aos="fade-up" v-for="member in members">
+                            <div style="display: flex; justify-content: space-between;">
+                                <div style="display: flex;">
+                                    <img class="member-icon" src=<%= cdn("image/tyrion.png") %> />
+                                    <div class="member-detail">
+                                        <div class="name">{{ member.name }}</div>
+                                        <div class="email">{{ member.email }}</div>
                                     </div>
                                 </div>
-                            </li>
-                        </ul>
-                    </div>
+                                <div>
+                                    <img class="icon" v-on:click="remove_member(member)"
+                                        src=<%= cdn("image/recycle_bin.png") %> />
+                                    <img class="icon" v-on:click="remove_member(member)"
+                                        src=<%= cdn("image/recycle_bin.png") %> />
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
                 <div class="section-container" v-show='role == "sections"'>
+                    <div style="display: flex; justify-content: space-between;">
+                        <div class="title">Sections</div>
+                        <div class="button">Create</div>
+                    </div>
                     <ul class="section-list">
                         <li class="section-item" data-aos="fade-up" v-for="section in sections">
                             <div class="section-contents">

@@ -10,7 +10,7 @@ app.use(express.json())
 app.locals.cdn = require('./modules/cdn')
 
 app.get('/', async_handler(async (req, res, next) => {
-    res.render('start', { title: 'jiseung', content: '핵고수가되자' })
+    res.render('home')
 }))
 
 app.use('/team', require('./routers/team'))

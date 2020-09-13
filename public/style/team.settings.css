@@ -60,22 +60,21 @@ img.team-icon
     width: 800px;
 }
 
-.member-container .member-group
+.member-container
 {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
-.member-container .member-group .title
+.member-container .title
 {
     font-weight: bold;
     font-size: 20px;
 }
 
-.member-container .member-group .desc
+.member-container .desc
 {
     font-size: 14px;
     color: #c0c0c0;
-    border-bottom: 1px #c0c0c0 solid;
     padding-bottom: 5px;
 }
 
@@ -109,6 +108,17 @@ img.team-icon
 {
     font-size: 12px;
     color: #c0c0c0;
+}
+
+.section-container
+{
+    margin-top: 15px;
+}
+
+.section-container .title
+{
+    font-size: 18px;
+    font-weight: bold;
 }
 
 .section-list
