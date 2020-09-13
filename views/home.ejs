@@ -4,12 +4,37 @@
 <head>
     <meta charset="utf-8">
     <title>home</title>
-    <link href="style.css" rel="style/stylesheet" />
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
+    <link rel="stylesheet" href=<%= cdn("style/home.css") %>>
     <script src="https://unpkg.com/vue"></script>
 </head>
 
 <body>
-    <h1>home</h1>
+    <div id="app" class="background">
+        <div class="contents">
+            <div class="title">Welcome to IOPM</div>
+            <div class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                ut labore et
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+                ex
+                ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+                fugiat
+                nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+                mollit
+                anim id est laborum.</div>
+            <div class="social-auth-buttons">
+                <button class="loginBtn loginBtn--facebook">
+                    Login with Facebook
+                </button>
+
+                <button v-on:click="google" class="loginBtn loginBtn--google">
+                    Login with Google
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="js/home.js"></script>
 </body>
 
 </html>
