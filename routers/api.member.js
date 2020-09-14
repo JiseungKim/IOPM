@@ -15,9 +15,13 @@ router.get('/all',async_handler(async(req, res, next)=> {
     }
 }))
 
-router.get('/find/:id', async_handler(async(req, res, next) => {
+router.get('/find_by_id/:id', async_handler(async(req, res, next) => {
     try {
         const mem = await member.find(req.params.id)
+
+        if(mem == null)
+            throw "없는 사용자입니다."
+
         res.json({ success:true, member:mem})
     } catch (err) {
         console.log(err)
@@ -36,10 +40,10 @@ router.post('/signup', async_handler(async(req, res, next) => {
     }
 }))
 
-router.put('/modify', async_handler(async(req, res, next) => {
+router.put('/update', async_handler(async(req, res, next) => {
     try {
         
-        await member.modify(req.body)
+        await member.update(req.body)
 
         res.json({ success:true, id:req.body.id })
 
@@ -51,7 +55,8 @@ router.put('/modify', async_handler(async(req, res, next) => {
 
 router.delete('/remove/:id', async_handler(async(req, res, next) => {
     try {
-        await member.remove(req.params.id)
+        const success = await member.remove(req.params.id)
+        res.json({ success:success })
     } catch (err) {
         console.log(err)
         res.json({ success:false, error:err })

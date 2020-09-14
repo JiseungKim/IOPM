@@ -38,11 +38,22 @@ router.get('/find_by_owner/:owner', async_handler(async(req, res, next) => {
     }
 }))
 
-// TODO: 가입한 팀 찾기
-router.get('/find_by_mid/:mid', async_handler(async(req, res, next) => {
+// 사용자가 가입한 팀 찾기
+router.get('/find_by_member/:mid', async_handler(async(req, res, next) => {
     try {
-        // const teams = await team.find_by_mid(req.params.id)
-        // res.json({ success:true, teams:teams })
+        const teams = await team.find_by_member(req.params.mid)
+        res.json({ success:true, teams:teams })
+    } catch (err) {
+        console.log(err)
+        res.json({ success:false, error:err })
+    }
+}))
+
+// 팀 멤버 찾기
+router.get('/find_by_team/:tid', async_handler(async(req, res, next) => {
+    try {
+        const members = await team.find_by_team(req.params.tid)
+        res.json({ success:true, members:members })
     } catch (err) {
         console.log(err)
         res.json({ success:false, error:err })
@@ -52,12 +63,18 @@ router.get('/find_by_mid/:mid', async_handler(async(req, res, next) => {
 router.post('/make', async_handler(async(req, res, next) => {
     try {
         
-        const tid = await team.add(req.body)
+        const tid = await team.add(req.body.team, req.body.member_id)
+
+        if(!tid)
+            throw "팀 이름이 중복됩니다"
 
         const pid = await participation.add({
             team_id:tid,
-            member_id:req.body.owner
+            member_id:req.body.member_id
         })
+        
+        if(pid == null)
+            throw "이미 가입되어있는 멤버입니다."
 
         res.json({ success:true, team_id:tid, participation_id:pid})
     } catch (err) {
@@ -66,10 +83,10 @@ router.post('/make', async_handler(async(req, res, next) => {
     }
 }))
 
-router.put('/modify', async_handler(async(req, res, next) => {
+router.put('/update', async_handler(async(req, res, next) => {
     try {
-        await team.modify(req.body.mid, req.body.team)
-        res.json({ success:true, team_id:req.body.team.id })
+        const success = await team.update(req.body.mid, req.body.team)
+        res.json({ success:success })
     } catch (err) {
         console.log(err)
         res.json({ success:false, error:err })
@@ -78,8 +95,8 @@ router.put('/modify', async_handler(async(req, res, next) => {
 
 router.delete('/remove/:id', async_handler(async(req, res, next) => {
     try {
-        await team.remove(req.params.id, req.body.mid)
-        res.json({ success:true, team_id:req.params.id })
+        const success = await team.remove(req.params.id, req.body.mid)
+        res.json({ success:success, team_id:req.params.id })
     } catch (err) {
         console.log(err)
         res.json({ success:false, error:err })

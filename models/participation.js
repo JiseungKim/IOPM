@@ -1,10 +1,10 @@
 
 const mysql = require('mysql2/promise')
-const config = require('../configs/configs.json')
+const settings = require('../config/appsettings.local.json')
 
 class Participation {
     constructor() {
-        this._pool = mysql.createPool(config.database)
+        this._pool = mysql.createPool(settings.database)
     }
 
     async get_all() {
@@ -14,9 +14,6 @@ class Participation {
             connection = await this._pool.getConnection()
 
             const [rows] = await connection.query(`SELECT * FROM team`)
-
-            if(rows.length == 0)
-                throw "팀이 없습니다."
 
             return rows
         } catch (err) {
@@ -36,7 +33,7 @@ class Participation {
             )
 
             if(rows.length > 0)
-                throw "이미 가입되어있는 멤버입니다."
+                return null
             
             const [result] = await connection.query(
                 `INSERT INTO participation(team_id,member_id) VALUES(${participation.team_id}, ${participation.member_id})`
@@ -49,9 +46,22 @@ class Participation {
         }
     }
 
-    async remove(id, mid) {
-        let connection = await this._pool.getConnection()
-        // TODO:
+    async remove(participation) {
+        let connection = null
+
+        try {
+            connection = await this._pool.getConnection()
+
+            const [result] = await connection.query(
+                `DELETE FROM participation WHERE member_id=${participation.member_id} AND team_id=${participation.team_id}`
+            )
+
+            return result.affectedRows > 0
+        } catch (err) {
+            throw err
+        } finally {
+            connection?.release()
+        }
     }
     
 }

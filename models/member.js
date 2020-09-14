@@ -1,13 +1,13 @@
 
 const mysql = require('mysql2/promise')
-const config = require('../configs/configs.json')
+const settings = require('../config/appsettings.local.json')
 const sha256 = require('../modules/SHA256')
 // 팀이름 공백, 영문, 한글, 숫자, _ , -만 가능하게 검사하기
 // SQL injection!
 
 class Member {
     constructor() {
-        this._pool = mysql.createPool(config.database)
+        this._pool = mysql.createPool(settings.database)
     }
 
     async update_last_login(mid) {
@@ -15,8 +15,10 @@ class Member {
 
         try {
             connection = await this._pool.getConnection()
+
             await connection.query(`UPDATE member SET last_login=now() WHERE id=${mid}`)
-        } catch(err) {
+
+        } catch (err) {
             throw err
         } finally {
             connection?.release()
@@ -28,10 +30,11 @@ class Member {
 
         try {
             connection = await this._pool.getConnection()
+
             const [rows] = await connection.query(`SELECT * FROM member WHERE id=${mid}`)
 
-            if(rows.length == 0)
-                throw "없는 사용자입니다."
+            if (rows.length == 0)
+                return null
 
             return rows[0]
         } catch (err) {
@@ -46,10 +49,8 @@ class Member {
 
         try {
             connection = await this._pool.getConnection()
-            const [rows] = await connection.query(`SELECT * FROM member`)
 
-            if(rows.length == 0)
-                throw "사용자가 없습니다."
+            const [rows] = await connection.query(`SELECT * FROM member`)
 
             return rows
         } catch (err) {
@@ -59,9 +60,9 @@ class Member {
         }
     }
 
-    check_duplication(member, rows) {
+    assert(member, rows) {
         // TODO: 정규식!!
-        const emailCheck = /([a-z0-9_\ .-]+)@([/da-z\ .-]+)\ .([a-z\ .]{2,6})/
+        const email_check = /([a-z0-9_\ .-]+)@([/da-z\ .-]+)\ .([a-z\ .]{2,6})/
 
         for(let row of rows) {
             if(row.email == member.email)
@@ -106,7 +107,7 @@ class Member {
         }
     }
 
-    async modify(member) {
+    async update(member) {
         let connection = null
 
         try {
@@ -124,12 +125,13 @@ class Member {
                     throw "중복된 핸드폰번호입니다."
             }
 
-            await connection.query(
+            const [result] = await connection.query(
                 `UPDATE member SET
                 nickname='${member.nickname}',photo='${member.photo}',phone='${member.phone}'
                 WHERE id=${member.id}`
             )
 
+            return result.affectedRows > 0
         } catch (err) {
             throw err
         } finally {
@@ -143,7 +145,10 @@ class Member {
 
         try {
             connection = await this._pool.getConnection()
-            await connection.query(`DELETE FROM member WHERE id=${mid}`)
+
+            const [result] = await connection.query(`DELETE FROM member WHERE id=${mid}`)
+            
+            return result.affectedRows > 0
         } catch (err) {
             throw err
         } finally {
