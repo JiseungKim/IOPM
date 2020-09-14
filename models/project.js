@@ -118,7 +118,6 @@ class Project {
     }
 
     async remove(project_id, member_id) {
-        console.log("삭제")
         let connection = null
 
         try {
@@ -133,7 +132,6 @@ class Project {
             
             if(team_owner[0].owner != member_id)
                 throw "관리자가 아닙니다."
-
 
             const [result] = await connection.query(
                 `DELETE FROM project WHERE id=${project_id}`
