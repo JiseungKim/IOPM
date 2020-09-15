@@ -23,7 +23,7 @@ window.onload = () => {
                 try {
                     const provider = new firebase.auth.GoogleAuthProvider();
                     const result = await firebase.auth().signInWithPopup(provider)
-                    const token = result.credential.idToken
+                    const token = await result.user.getIdToken()
                     const response = await this.$http.post
                         (
                             'auth/authenticate',
