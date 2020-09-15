@@ -18,6 +18,7 @@ app.use('/member', require('./routers/member'))
 app.use('/api/team', require('./routers/api.team'))
 app.use('/api/section', require('./routers/api.section'))
 app.use('/api/member', require('./routers/api.member'))
+app.use('/auth', require('./routers/auth'))
 
 app.get('/', async_handler(async (req, res, next) => {
     res.render('home', { data: { title: 'cshyeon' } })

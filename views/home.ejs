@@ -8,6 +8,8 @@
     <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-auth.js"></script>
     <link rel="stylesheet" href=<%= cdn("style/home.css") %>>
     <script src="https://unpkg.com/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <script src="https://unpkg.com/vue-cookies@1.7.4/vue-cookies.js"></script>
 </head>
 
 <body>
@@ -24,7 +26,7 @@
                 mollit
                 anim id est laborum.</div>
             <div class="social-auth-buttons">
-                <button class="loginBtn loginBtn--facebook">
+                <button v-on:click="facebook" class=" loginBtn loginBtn--facebook">
                     Login with Facebook
                 </button>
 
