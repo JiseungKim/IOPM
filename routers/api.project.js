@@ -60,6 +60,10 @@ router.put('/update/:pid', async_handler(async(req, res, next) => {
 router.delete('/remove/:pid', async_handler(async(req, res, next) => {
     try {
         const success = await project.remove(req.params.pid, req.body.member_id)
+
+        if(success == null)
+            throw "관리자가 아닙니다."
+
         res.json({ success:success })
     } catch (err) {
         console.log(err)

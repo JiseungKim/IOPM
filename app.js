@@ -22,6 +22,7 @@ app.use('/api/member', require('./routers/api.member'))
 app.use('/api/team', require('./routers/api.team'))
 app.use('/api/participation', require('./routers/api.participation'))
 app.use('/api/project', require('./routers/api.project'))
+app.use('/api/todo', require('./routers/api.todo'))
 app.use('/auth', require('./routers/auth'))
 
 app.get('/', async_handler(async (req, res, next) => {

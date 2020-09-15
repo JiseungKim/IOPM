@@ -1,9 +1,6 @@
 
 const mysql = require('mysql2/promise')
 const settings = require('../config/appsettings.local.json')
-const Team = require('./team')
-
-const team = new Team()
 
 // TODO: 정규식
 
@@ -12,13 +9,13 @@ class Project {
         this._pool = mysql.createPool(settings.database)
     }
 
-    async find_by_id(pid) {
+    async find_by_id(section_id) {
         let connection = null
 
         try {
             connection = await this._pool.getConnection()
 
-            const [rows] = await connection.query(`SELECT * FROM project WHERE id=${pid}`)
+            const [rows] = await connection.query(`SELECT * FROM section WHERE id=${section_id}`)
 
             if (rows.length == 0)
                 return null
@@ -31,13 +28,13 @@ class Project {
         }
     }
 
-    async find_by_team(tid) {
+    async find_by_project(project_id) {
         let connection = null
 
         try {
             connection = await this._pool.getConnection()
 
-            const [rows] = await connection.query(`SELECT * FROM project WHERE team_id=${tid}`)
+            const [rows] = await connection.query(`SELECT * FROM section WHERE project_id=${project_id}`)
 
             return rows
         } catch (err) {
@@ -47,7 +44,7 @@ class Project {
         }
     }
 
-    async add(project, member_id, team_id) {
+    async add(section, member_id, project_id) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
@@ -63,16 +60,16 @@ class Project {
                 throw "관리자가 아닙니다."
 
             // TODO: 프로젝트 이름 정규식
-            // 팀 내에 중복된 이름의 프로젝트가 존재하는지 검사
+            // 팀 내에 중복된 이름의 섹션 존재하는지 검사
             const [exists] = await connection.query(
-                `SELECT * FROM project
-                WHERE name='${project.name}' AND team_id=${team_id}`
+                `SELECT * FROM section
+                WHERE name='${section.name}' AND project_id=${project_id}`
             )
 
             if (exists.length > 0)
                 return null
 
-            const [result] = await connection.query(`INSERT INTO project(team_id,name) VALUES(${team_id},'${project.name}')`)
+            const [result] = await connection.query(`INSERT INTO section(project_id,name) VALUES(${project_id},'${section.name}')`)
 
             return result.insertId
         } catch (err) {
@@ -82,7 +79,7 @@ class Project {
         }
     }
 
-    async update(project, member_id, project_id) {
+    async update(section_id, section, member_id, project_id) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
@@ -96,17 +93,17 @@ class Project {
             
             if(team_owner[0].owner != member_id)
                 throw "관리자가 아닙니다."
-
-            // 프로젝트 이름 중복 검사
+            
+            // 섹션 이름 중복 검사
             const [exists] = await connection.query(
-                `SELECT COUNT(*) AS count FROM project
-                WHERE NOT id=${project_id} AND name='${project.name}' AND team_id=${team_owner[0].team_id}`
+                `SELECT COUNT(*) AS count FROM section
+                WHERE NOT id=${section_id} AND name='${section.name}' AND project_id=${project_id}`
             )
 
             if (exists[0].count > 0)
                 return null
             
-            const [result] = await this._pool.query(`UPDATE project SET name='${project.name}' WHERE id=${project_id}`)
+            const [result] = await this._pool.query(`UPDATE section SET name='${section.name}' WHERE id=${section_id}`)
 
             return result.affectedRows > 0
 
@@ -117,7 +114,7 @@ class Project {
         }
     }
 
-    async remove(project_id, member_id) {
+    async remove(section_id, member_id, project_id) {
         let connection = null
 
         try {
@@ -134,7 +131,7 @@ class Project {
                 return null
 
             const [result] = await connection.query(
-                `DELETE FROM project WHERE id=${project_id}`
+                `DELETE FROM section WHERE id=${section_id}`
             )
 
             return result.affectedRows > 0
