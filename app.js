@@ -13,10 +13,7 @@ app.get('/', async_handler(async (req, res, next) => {
     res.render('home')
 }))
 
-app.use('/auth', require('./routers/auth'))
-app.use('/member', require('./routers/member'))
-
-app.use('/api/member', require('./routers/api.member'))
+app.use('/api/user', require('./routers/api.user'))
 app.use('/api/section', require('./routers/api.section'))
 app.use('/api/participation', require('./routers/api.participation'))
 app.use('/api/project', require('./routers/api.project'))

@@ -28,13 +28,13 @@ class Project {
         }
     }
 
-    async find_by_owner(member_id) {
+    async find_by_owner(user_id) {
         let connection = null
 
         try {
             connection = await this._pool.getConnection()
 
-            const [rows] = await connection.query(`SELECT * FROM project WHERE owner=${member_id}`)
+            const [rows] = await connection.query(`SELECT * FROM project WHERE owner=${user_id}`)
 
             return rows
         } catch (err) {
@@ -44,7 +44,7 @@ class Project {
         }
     }
 
-    async find_by_member(member_id) {
+    async find_by_user(user_id) {
         let connection = null
 
         try {
@@ -52,7 +52,7 @@ class Project {
 
             const [rows] = await connection.query(
                 `SELECT * FROM project
-                JOIN (SELECT project_id FROM participation WHERE member_id=${member_id}) as PTCP
+                JOIN (SELECT project_id FROM participation WHERE user_id=${user_id}) as PTCP
                 ON project.id = PTCP.project_id;`
             )
 
@@ -64,7 +64,7 @@ class Project {
         }
     }
 
-    async add(project, member_id) {
+    async add(project, user_id) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
@@ -73,14 +73,14 @@ class Project {
             // 자신이 만든 프로젝트에 중복된 팀 이름이 있는지 검사
             const [exists] = await connection.query(
                 `SELECT COUNT(*) AS count FROM project
-                WHERE name='${project.name}' AND owner=${member_id}`
+                WHERE name='${project.name}' AND owner=${user_id}`
             )
 
             if (exists[0].count > 0)
                 return null
 
             const [result] = await connection.query(
-                `INSERT INTO project(name,owner) VALUES('${project.name}', ${member_id})`
+                `INSERT INTO project(name,owner) VALUES('${project.name}', ${user_id})`
             )
 
             return result.insertId
@@ -91,22 +91,22 @@ class Project {
         }
     }
 
-    async update(project, member_id, project_id) {
+    async update(project, user_id, project_id) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
 
-            // team의 관리자 찾기
-            const [team_owner] = await connection.query(
+            // project의 관리자 찾기
+            const [project_owner] = await connection.query(
                 `SELECT owner FROM project WHERE id=${project_id}`
             )
             
-            if(team_owner[0].owner != member_id)
+            if(project_owner[0].owner != user_id)
                 throw "관리자가 아닙니다."
 
             const [exists] = await connection.query(
                 `SELECT COUNT(*) AS count FROM project
-                WHERE NOT id=${project_id} AND owner=${member_id} AND name='${project.name}'`
+                WHERE NOT id=${project_id} AND owner=${user_id} AND name='${project.name}'`
             )
 
             if (exists[0].count > 0)
@@ -125,18 +125,18 @@ class Project {
         }
     }
 
-    async remove(project_id, member_id) {
+    async remove(project_id, user_id) {
         let connection = null
 
         try {
             connection = await this._pool.getConnection()
 
             // team의 관리자 찾기
-            const [team_owner] = await connection.query(
+            const [project_owner] = await connection.query(
                 `SELECT owner FROM project WHERE id=${project_id}`
             )
             
-            if(team_owner[0].owner != member_id)
+            if(project_owner[0].owner != user_id)
                 throw "관리자가 아닙니다."
 
             const [result] = await connection.query(

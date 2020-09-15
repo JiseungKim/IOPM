@@ -44,7 +44,7 @@ class Project {
         }
     }
 
-    async add(section, member_id, project_id) {
+    async add(section, user_id, project_id) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
@@ -54,7 +54,7 @@ class Project {
                 `SELECT owner FROM project WHERE id=${project_id}`
             )
             
-            if(project_owner[0].owner != member_id)
+            if(project_owner[0].owner != user_id)
                 throw "관리자가 아닙니다."
 
             // TODO: 프로젝트 이름 정규식
@@ -77,7 +77,7 @@ class Project {
         }
     }
 
-    async update(section_id, section, member_id, project_id) {
+    async update(section_id, section, user_id, project_id) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
@@ -87,7 +87,7 @@ class Project {
                 `SELECT owner FROM project WHERE id=${project_id}`
             )
             
-            if(project_owner[0].owner != member_id)
+            if(project_owner[0].owner != user_id)
                 throw "관리자가 아닙니다."
             
             // 섹션 이름 중복 검사
@@ -110,7 +110,7 @@ class Project {
         }
     }
 
-    async remove(section_id, member_id, project_id) {
+    async remove(section_id, user_id, project_id) {
         let connection = null
 
         try {
@@ -121,7 +121,7 @@ class Project {
                 `SELECT owner FROM project WHERE id=${project_id}`
             )
             
-            if(project_owner[0].owner != member_id)
+            if(project_owner[0].owner != user_id)
                 return null
 
             const [result] = await connection.query(

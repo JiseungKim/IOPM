@@ -60,15 +60,21 @@ class Todo {
         }
     }
 
-    async add(todo) {
+    async add(todo, user_id) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
 
+            // 프로젝트 참여 검사
+            const [project_user] = await this._pool.query(`SELECT * FROM participation WHERE project_id=${todo.project_id} AND user_id=${user_id}`)
+
+            if(project_user.length == 0)
+                return null
+
             // TODO: deadline 컬럼 추가
             const [result] = await connection.query(
-                `INSERT INTO todo(title, description, section_id, project_id, owner, importance) 
-                VALUES('${todo.title}', '${todo.desc}', ${todo.section_id}, ${todo.project_id}, ${todo.owner}, ${todo.importance})`
+                `INSERT INTO todo(title, description, section_id, project_id, owner, importance, deadline) 
+                VALUES('${todo.title}', '${todo.desc}', ${todo.section_id}, ${todo.project_id}, ${todo.owner}, ${todo.importance}, ${todo.deadline})`
             )
 
             return result.insertId
@@ -79,7 +85,7 @@ class Todo {
         }
     }
 
-    async update(todo, todo_id, member_id) {
+    async update(todo, todo_id, user_id) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
@@ -87,13 +93,13 @@ class Todo {
             // todo의 관리자 찾기
             const [todo_owner] = await connection.query(`SELECT owner FROM todo WHERE id=${todo_id}`)
             
-            if(todo_owner[0].owner != member_id)
+            if(todo_owner[0].owner != user_id)
                 return null
             
             // TODO: deadline 컬럼 추가
             const [result] = await this._pool.query(
                 `UPDATE todo
-                SET title='${todo.title}', description='${todo.desc}', importance=${todo.importance}
+                SET title='${todo.title}', description='${todo.desc}', importance=${todo.importance}, deadline=${todo.deadline}
                 WHERE id=${todo_id}`
             )
 
@@ -106,7 +112,7 @@ class Todo {
         }
     }
 
-    async remove(todo_id, member_id) {
+    async remove(todo_id, user_id) {
         let connection = null
 
         try {
@@ -115,7 +121,7 @@ class Todo {
             // todo의 관리자 찾기
             const [todo_owner] = await connection.query(`SELECT owner FROM todo WHERE id=${todo_id}`)
             
-            if(todo_owner[0].owner != member_id)
+            if(todo_owner[0].owner != user_id)
                 return null
 
             // `DELETE FROM todo WHERE id=${todo_id}`

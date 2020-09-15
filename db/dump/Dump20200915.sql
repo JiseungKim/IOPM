@@ -16,28 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `member`
---
-
-DROP TABLE IF EXISTS `member`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
-CREATE TABLE `member` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `email` varchar(100) COLLATE euckr_bin NOT NULL,
-  `password` varchar(200) COLLATE euckr_bin NOT NULL,
-  `nickname` varchar(100) COLLATE euckr_bin NOT NULL,
-  `phone` varchar(30) COLLATE euckr_bin DEFAULT NULL,
-  `photo` varchar(500) COLLATE euckr_bin DEFAULT NULL,
-  `last_login` datetime DEFAULT CURRENT_TIMESTAMP,
-  `created_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `nickname_UNIQUE` (`nickname`),
-  UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `participation`
 --
 
@@ -47,13 +25,13 @@ DROP TABLE IF EXISTS `participation`;
 CREATE TABLE `participation` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
-  `member_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `member_id_idx` (`member_id`),
+  KEY `member_id_idx` (`user_id`),
   KEY `fk_participation_project_idx` (`project_id`),
-  CONSTRAINT `fk_participation_member` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_participation_member` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_participation_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -70,7 +48,7 @@ CREATE TABLE `project` (
   `created_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `owner_idx` (`owner`),
-  CONSTRAINT `owner` FOREIGN KEY (`owner`) REFERENCES `member` (`id`)
+  CONSTRAINT `owner` FOREIGN KEY (`owner`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -114,10 +92,32 @@ CREATE TABLE `todo` (
   KEY `fk_todo_section_idx` (`section_id`),
   KEY `fk_todo_member_idx` (`owner`),
   KEY `fk_todo_project_idx` (`project_id`),
-  CONSTRAINT `fk_todo_member` FOREIGN KEY (`owner`) REFERENCES `member` (`id`),
+  CONSTRAINT `fk_todo_member` FOREIGN KEY (`owner`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_todo_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`),
   CONSTRAINT `fk_todo_section` FOREIGN KEY (`section_id`) REFERENCES `section` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(100) COLLATE euckr_bin NOT NULL,
+  `password` varchar(200) COLLATE euckr_bin NOT NULL,
+  `nickname` varchar(100) COLLATE euckr_bin NOT NULL,
+  `phone` varchar(30) COLLATE euckr_bin DEFAULT NULL,
+  `photo` varchar(500) COLLATE euckr_bin DEFAULT NULL,
+  `last_login` datetime DEFAULT CURRENT_TIMESTAMP,
+  `created_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nickname_UNIQUE` (`nickname`),
+  UNIQUE KEY `email_UNIQUE` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -129,4 +129,4 @@ CREATE TABLE `todo` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-15 15:53:40
+-- Dump completed on 2020-09-15 20:26:16

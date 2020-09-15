@@ -41,7 +41,11 @@ router.get('/find_by_project/:pid', async_handler(async(req, res, next) => {
 
 router.post('/make', async_handler(async(req, res, next) => {
     try {
-        const tid = await todo.add(req.body)
+        const tid = await todo.add(req.body.todo, req.body.user_id)
+
+        if(tid == null)
+            throw "참여자가 아닙니다."
+
         res.json({ success:true, todo_id:tid })
     } catch (err) {
         console.log(err)
@@ -51,7 +55,7 @@ router.post('/make', async_handler(async(req, res, next) => {
 
 router.post('/update/:tid', async_handler(async(req, res, next) => {
     try {
-        const success = await todo.update(req.body.todo, req.params.tid, req.body.member_id)
+        const success = await todo.update(req.body.todo, req.params.tid, req.body.user_id)
 
         if(success == null)
             throw "관리자가 아닙니다."
@@ -65,7 +69,7 @@ router.post('/update/:tid', async_handler(async(req, res, next) => {
 
 router.post('/remove/:tid', async_handler(async(req, res, next) => {
     try {
-        const success = await todo.remove(req.params.tid, req.body.member_id)
+        const success = await todo.remove(req.params.tid, req.body.user_id)
 
         if(success == null)
             throw "관리자가 아닙니다."

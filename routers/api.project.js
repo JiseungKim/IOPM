@@ -16,9 +16,9 @@ router.get('/find_by_id/:pid', async_handler(async(req, res, next) => {
 }))
 
 // 관리자로 검색
-router.get('/find_by_owner/:mid', async_handler(async(req, res, next) => {
+router.get('/find_by_owner/:uid', async_handler(async(req, res, next) => {
     try {
-        const pjs = await project.find_by_owner(req.params.mid)
+        const pjs = await project.find_by_owner(req.params.uid)
         res.json({ success:true, projects:pjs })
     } catch (err) {
         console.log(err)
@@ -27,9 +27,9 @@ router.get('/find_by_owner/:mid', async_handler(async(req, res, next) => {
 }))
 
 // 가입한 프로젝트 검색
-router.get('/find_by_member/:mid', async_handler(async(req, res, next) => {
+router.get('/find_by_user/:uid', async_handler(async(req, res, next) => {
     try {
-        const pjs = await project.find_by_member(req.params.mid)
+        const pjs = await project.find_by_user(req.params.uid)
         res.json({ success:true, projects:pjs })
     } catch (err) {
         console.log(err)
@@ -41,7 +41,7 @@ router.get('/find_by_member/:mid', async_handler(async(req, res, next) => {
 router.post('/make', async_handler(async(req, res, next) => {
     // TODO: 팀의 관리자만 생성 가능
     try {
-        const pid = await project.add(req.body.project, req.body.member_id)
+        const pid = await project.add(req.body.project, req.body.user_id)
 
         if(pid == null)
             throw "프로젝트 이름이 중복됩니다"
@@ -55,7 +55,7 @@ router.post('/make', async_handler(async(req, res, next) => {
 
 router.post('/update/:pid', async_handler(async(req, res, next) => {
     try {
-        const success = await project.update(req.body.project, req.body.member_id, req.params.pid)
+        const success = await project.update(req.body.project, req.body.user_id, req.params.pid)
 
         if(success == null)
             throw "프로젝트 이름이 중복됩니다"
@@ -69,7 +69,7 @@ router.post('/update/:pid', async_handler(async(req, res, next) => {
 
 router.post('/remove/:pid', async_handler(async(req, res, next) => {
     try {
-        const success = await project.remove(req.params.pid, req.body.member_id)
+        const success = await project.remove(req.params.pid, req.body.user_id)
 
         if(success == null)
             throw "관리자가 아닙니다."

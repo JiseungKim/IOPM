@@ -28,7 +28,7 @@ router.get('/find_by_project/:pid', async_handler(async (req, res, next) => {
 // section 생성
 router.post('/make', async_handler(async(req, res, next) => {
     try {
-        const sid = await section.add(req.body.section, req.body.member_id, req.body.project_id)
+        const sid = await section.add(req.body.section, req.body.user_id, req.body.project_id)
 
         if(sid == null)
             throw "섹션 이름이 중복됩니다"
@@ -42,7 +42,7 @@ router.post('/make', async_handler(async(req, res, next) => {
 
 router.post('/update/:sid', async_handler(async(req, res, next) => {
     try {
-        const success = await section.update(req.params.sid, req.body.member_id, req.body.member_id, req.body.project_id)
+        const success = await section.update(req.params.sid, req.body.user_id, req.body.user_id, req.body.project_id)
 
         if(success == null)
             throw "섹션 이름이 중복됩니다"
@@ -56,7 +56,7 @@ router.post('/update/:sid', async_handler(async(req, res, next) => {
 
 router.post('/remove/:sid', async_handler(async(req, res, next) => {
     try {
-        const success = await section.remove(req.params.sid, req.body.member_id, req.body.project_id)
+        const success = await section.remove(req.params.sid, req.body.user_id, req.body.project_id)
         
         if(success == null)
             throw "관리자가 아닙니다."
