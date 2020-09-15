@@ -1,14 +1,59 @@
-const { Router } = require('express')
-const router = Router()
-const async_handler = require('express-async-handler')
+const { Router } = require("express");
+const router = Router();
+const async_handler = require("express-async-handler");
 
-router.post('/authenticate', async_handler(async (req, res, next) => {
-    const id_token = req.body.token
-    // verify firebase id token
+const uuid4 = require("uuid4");
+const jwt = require("jsonwebtoken");
 
-    const access_token = 'sample access token'
-    const refresh_token = 'sample refresh token'
-    res.json({ success: true, uuid: 'uuid', tokens: { access: access_token, refresh: refresh_token } })
-}))
+const appsettings = require("./modules/config");
 
-module.exports = router
+const admin = require("firebase-admin");
+const service_account = require("../config/iopm-f7940-firebase-adminsdk-ntf1b-b42b1f00ad.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(service_account),
+  databaseURL: "https://iopm-f7940.firebaseio.com",
+});
+
+router.post(
+  "/authenticate",
+  async_handler(async (req, res, next) => {
+    const id_token = req.body.token;
+
+    try {
+      const decoded_token = await admin.auth().verifyIdToken(id_token);
+      console.log(decoded_token);
+      const uid = decoded_token.uid;
+
+      if (!uuid4.valid(uid)) throw "유효하지 않습니다";
+
+      console.log(uid);
+
+      const access_token = jwt.sign(
+        { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": uid },
+        appsettings.secret_key,
+        {
+          expireIn: appsettings.token_expire.access_expire,
+        }
+      );
+      const refresh_token = jwt.sign(
+        { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": uid },
+        appsettings.secret_key,
+        {
+          expireIn: appsettings.token_expire.refresh_expire,
+        }
+      );
+
+      res.json({
+        success: true,
+        uuid: uid,
+        tokens: { access: access_token, refresh: refresh_token },
+      });
+    } catch (err) {
+      console.log(err);
+      res.json({ success: false });
+    }
+  })
+);
+
+module.exports = router;
