@@ -49,7 +49,7 @@ router.post('/make', async_handler(async(req, res, next) => {
     }
 }))
 
-router.put('/update/:tid', async_handler(async(req, res, next) => {
+router.post('/update/:tid', async_handler(async(req, res, next) => {
     try {
         const success = await todo.update(req.body.todo, req.params.tid, req.body.member_id)
 
@@ -63,7 +63,7 @@ router.put('/update/:tid', async_handler(async(req, res, next) => {
     }
 }))
 
-router.delete('/remove/:tid', async_handler(async(req, res, next) => {
+router.post('/remove/:tid', async_handler(async(req, res, next) => {
     try {
         const success = await todo.remove(req.params.tid, req.body.member_id)
 

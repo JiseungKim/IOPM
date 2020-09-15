@@ -83,7 +83,7 @@ class Member {
 
             const [rows] = await connection.query(
                 `SELECT * FROM member
-                WHERE email='${member.email}' OR nickname='${member.nickname}' OR phone='${member.phone}'`
+                WHERE email='${member.email}' OR nickname='${member.nickname}'`
             )
 
             for(let row of rows) {
@@ -91,13 +91,11 @@ class Member {
                     throw "중복된 이메일입니다."
                 if(row.nickname == member.nickname)
                     throw "중복된 닉네임입니다."
-                if(row.phone == member.phone)
-                    throw "중복된 핸드폰번호입니다."
             }
 
             const [result] = await connection.query(
-                `INSERT INTO member(email,password,name,nickname,gender,phone,photo)
-                VALUES('${member.email}','${code}','${member.name}','${member.nickname}','${member.gender}','${member.phone}','${member.photo}')`
+                `INSERT INTO member(email,password,nickname,phone,photo)
+                VALUES('${member.email}','${code}','${member.nickname}','${member.phone}','${member.photo}')`
             )
             return result.insertId
         } catch (err) {
@@ -107,28 +105,24 @@ class Member {
         }
     }
 
-    async update(member) {
+    async update(member_id, member) {
         let connection = null
 
         try {
             connection = await this._pool.getConnection()
             
-            const [rows] = await connection.query(
-                `SELECT * FROM member
-                WHERE email!='${member.email}' AND (nickname='${member.nickname}' OR phone='${member.phone}')`
+            const [exists] = await connection.query(
+                `SELECT COUNT(*) AS count FROM member
+                WHERE NOT id='${member_id}' AND nickname='${member.nickname}'`
             )
 
-            for(let row of rows) {
-                if(row.nickname == member.nickname)
-                    throw "중복된 닉네임입니다."
-                if(row.phone == member.phone)
-                    throw "중복된 핸드폰번호입니다."
-            }
+            if (exists[0].count > 0)
+                return null
 
             const [result] = await connection.query(
                 `UPDATE member SET
                 nickname='${member.nickname}',photo='${member.photo}',phone='${member.phone}'
-                WHERE id=${member.id}`
+                WHERE id=${member_id}`
             )
 
             return result.affectedRows > 0

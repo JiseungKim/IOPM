@@ -40,12 +40,14 @@ router.post('/signup', async_handler(async(req, res, next) => {
     }
 }))
 
-router.put('/update', async_handler(async(req, res, next) => {
+router.post('/update/:id', async_handler(async(req, res, next) => {
     try {
-        
-        await member.update(req.body)
+        const success = await member.update(req.params.id, req.body)
 
-        res.json({ success:true, id:req.body.id })
+        if(success == null)
+            throw "중복된 닉네임입니다."
+
+        res.json({ success:success, id:req.body.id })
 
     } catch (err) {
         console.log(err)
@@ -53,7 +55,7 @@ router.put('/update', async_handler(async(req, res, next) => {
     }
 }))
 
-router.delete('/remove/:id', async_handler(async(req, res, next) => {
+router.post('/remove/:id', async_handler(async(req, res, next) => {
     try {
         const success = await member.remove(req.params.id)
         res.json({ success:success })

@@ -50,13 +50,11 @@ class Project {
             connection = await this._pool.getConnection()
 
             // team의 관리자 찾기
-            const [team_owner] = await connection.query(
-                `SELECT owner, team_id FROM project AS p
-                JOIN team ON p.team_id=team.id
-                WHERE p.id=${project_id}`
+            const [project_owner] = await connection.query(
+                `SELECT owner FROM project WHERE id=${project_id}`
             )
             
-            if(team_owner[0].owner != member_id)
+            if(project_owner[0].owner != member_id)
                 throw "관리자가 아닙니다."
 
             // TODO: 프로젝트 이름 정규식
@@ -85,13 +83,11 @@ class Project {
             connection = await this._pool.getConnection()
 
             // team의 관리자 찾기
-            const [team_owner] = await connection.query(
-                `SELECT owner, team_id FROM project AS p
-                JOIN team ON p.team_id=team.id
-                WHERE p.id=${project_id}`
+            const [project_owner] = await connection.query(
+                `SELECT owner FROM project WHERE id=${project_id}`
             )
             
-            if(team_owner[0].owner != member_id)
+            if(project_owner[0].owner != member_id)
                 throw "관리자가 아닙니다."
             
             // 섹션 이름 중복 검사
@@ -121,13 +117,11 @@ class Project {
             connection = await this._pool.getConnection()
 
             // team의 관리자 찾기
-            const [team_owner] = await connection.query(
-                `SELECT owner, team_id FROM project AS p
-                JOIN team ON p.team_id=team.id
-                WHERE p.id=${project_id}`
+            const [project_owner] = await connection.query(
+                `SELECT owner FROM project WHERE id=${project_id}`
             )
             
-            if(team_owner[0].owner != member_id)
+            if(project_owner[0].owner != member_id)
                 return null
 
             const [result] = await connection.query(

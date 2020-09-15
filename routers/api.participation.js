@@ -29,7 +29,7 @@ router.post('/join', async_handler(async(req, res, next) => {
     }
 }))
 
-router.delete('/out', async_handler(async(req, res, next) => {
+router.post('/out', async_handler(async(req, res, next) => {
     try {
         const success = await participation.remove(req.body)
         res.json({ success:success })

@@ -15,11 +15,21 @@ router.get('/find_by_id/:pid', async_handler(async(req, res, next) => {
     }
 }))
 
-// 팀으로 검색
-router.get('/find_by_team/:tid', async_handler(async(req, res, next) => {
-    // TODO: 자신이 속한 팀의 프로젝트만 검색가능하게
+// 관리자로 검색
+router.get('/find_by_owner/:mid', async_handler(async(req, res, next) => {
     try {
-        const pjs = await project.find_by_team(req.params.tid)
+        const pjs = await project.find_by_owner(req.params.mid)
+        res.json({ success:true, projects:pjs })
+    } catch (err) {
+        console.log(err)
+        res.json({ success:false, error:err })
+    }
+}))
+
+// 가입한 프로젝트 검색
+router.get('/find_by_member/:mid', async_handler(async(req, res, next) => {
+    try {
+        const pjs = await project.find_by_member(req.params.mid)
         res.json({ success:true, projects:pjs })
     } catch (err) {
         console.log(err)
@@ -31,7 +41,7 @@ router.get('/find_by_team/:tid', async_handler(async(req, res, next) => {
 router.post('/make', async_handler(async(req, res, next) => {
     // TODO: 팀의 관리자만 생성 가능
     try {
-        const pid = await project.add(req.body.project, req.body.member_id, req.body.team_id)
+        const pid = await project.add(req.body.project, req.body.member_id)
 
         if(pid == null)
             throw "프로젝트 이름이 중복됩니다"
@@ -43,7 +53,7 @@ router.post('/make', async_handler(async(req, res, next) => {
     }
 }))
 
-router.put('/update/:pid', async_handler(async(req, res, next) => {
+router.post('/update/:pid', async_handler(async(req, res, next) => {
     try {
         const success = await project.update(req.body.project, req.body.member_id, req.params.pid)
 
@@ -57,7 +67,7 @@ router.put('/update/:pid', async_handler(async(req, res, next) => {
     }
 }))
 
-router.delete('/remove/:pid', async_handler(async(req, res, next) => {
+router.post('/remove/:pid', async_handler(async(req, res, next) => {
     try {
         const success = await project.remove(req.params.pid, req.body.member_id)
 

@@ -40,7 +40,7 @@ router.post('/make', async_handler(async(req, res, next) => {
     }
 }))
 
-router.put('/update/:sid', async_handler(async(req, res, next) => {
+router.post('/update/:sid', async_handler(async(req, res, next) => {
     try {
         const success = await section.update(req.params.sid, req.body.member_id, req.body.member_id, req.body.project_id)
 
@@ -54,7 +54,7 @@ router.put('/update/:sid', async_handler(async(req, res, next) => {
     }
 }))
 
-router.delete('/remove/:sid', async_handler(async(req, res, next) => {
+router.post('/remove/:sid', async_handler(async(req, res, next) => {
     try {
         const success = await section.remove(req.params.sid, req.body.member_id, req.body.project_id)
         

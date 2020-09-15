@@ -1,9 +1,6 @@
 
 const mysql = require('mysql2/promise')
 const settings = require('../config/appsettings.local.json')
-const Team = require('./team')
-
-const team = new Team()
 
 // TODO: 정규식
 
@@ -31,13 +28,13 @@ class Project {
         }
     }
 
-    async find_by_team(tid) {
+    async find_by_owner(member_id) {
         let connection = null
 
         try {
             connection = await this._pool.getConnection()
 
-            const [rows] = await connection.query(`SELECT * FROM project WHERE team_id=${tid}`)
+            const [rows] = await connection.query(`SELECT * FROM project WHERE owner=${member_id}`)
 
             return rows
         } catch (err) {
@@ -47,32 +44,44 @@ class Project {
         }
     }
 
-    async add(project, member_id, team_id) {
+    async find_by_member(member_id) {
+        let connection = null
+
+        try {
+            connection = await this._pool.getConnection()
+
+            const [rows] = await connection.query(
+                `SELECT * FROM project
+                JOIN (SELECT project_id FROM participation WHERE member_id=${member_id}) as PTCP
+                ON project.id = PTCP.project_id;`
+            )
+
+            return rows
+        } catch (err) {
+            throw err
+        } finally {
+            connection?.release()
+        }
+    }
+
+    async add(project, member_id) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
 
-            // team의 관리자 찾기
-            const [team_owner] = await connection.query(
-                `SELECT owner, team_id FROM project AS p
-                JOIN team ON p.team_id=team.id
-                WHERE p.id=${project_id}`
-            )
-            
-            if(team_owner[0].owner != member_id)
-                throw "관리자가 아닙니다."
-
             // TODO: 프로젝트 이름 정규식
-            // 팀 내에 중복된 이름의 프로젝트가 존재하는지 검사
+            // 자신이 만든 프로젝트에 중복된 팀 이름이 있는지 검사
             const [exists] = await connection.query(
-                `SELECT * FROM project
-                WHERE name='${project.name}' AND team_id=${team_id}`
+                `SELECT COUNT(*) AS count FROM project
+                WHERE name='${project.name}' AND owner=${member_id}`
             )
 
-            if (exists.length > 0)
+            if (exists[0].count > 0)
                 return null
 
-            const [result] = await connection.query(`INSERT INTO project(team_id,name) VALUES(${team_id},'${project.name}')`)
+            const [result] = await connection.query(
+                `INSERT INTO project(name,owner) VALUES('${project.name}', ${member_id})`
+            )
 
             return result.insertId
         } catch (err) {
@@ -89,24 +98,23 @@ class Project {
 
             // team의 관리자 찾기
             const [team_owner] = await connection.query(
-                `SELECT owner, team_id FROM project AS p
-                JOIN team ON p.team_id=team.id
-                WHERE p.id=${project_id}`
+                `SELECT owner FROM project WHERE id=${project_id}`
             )
             
             if(team_owner[0].owner != member_id)
                 throw "관리자가 아닙니다."
 
-            // 프로젝트 이름 중복 검사
             const [exists] = await connection.query(
                 `SELECT COUNT(*) AS count FROM project
-                WHERE NOT id=${project_id} AND name='${project.name}' AND team_id=${team_owner[0].team_id}`
+                WHERE NOT id=${project_id} AND owner=${member_id} AND name='${project.name}'`
             )
 
             if (exists[0].count > 0)
                 return null
             
-            const [result] = await this._pool.query(`UPDATE project SET name='${project.name}' WHERE id=${project_id}`)
+            const [result] = await this._pool.query(
+                `UPDATE project SET name='${project.name}' WHERE id=${project_id}`
+            )
 
             return result.affectedRows > 0
 
@@ -125,13 +133,11 @@ class Project {
 
             // team의 관리자 찾기
             const [team_owner] = await connection.query(
-                `SELECT owner, team_id FROM project AS p
-                JOIN team ON p.team_id=team.id
-                WHERE p.id=${project_id}`
+                `SELECT owner FROM project WHERE id=${project_id}`
             )
             
             if(team_owner[0].owner != member_id)
-                return null
+                throw "관리자가 아닙니다."
 
             const [result] = await connection.query(
                 `DELETE FROM project WHERE id=${project_id}`

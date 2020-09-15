@@ -29,14 +29,14 @@ class Participation {
             connection = await this._pool.getConnection()
 
             const [rows] = await connection.query(
-                `SELECT * FROM participation WHERE team_id=${participation.team_id} AND member_id=${participation.member_id}`
+                `SELECT * FROM participation WHERE project_id=${participation.project_id} AND member_id=${participation.member_id}`
             )
 
             if(rows.length > 0)
                 return null
             
             const [result] = await connection.query(
-                `INSERT INTO participation(team_id,member_id) VALUES(${participation.team_id}, ${participation.member_id})`
+                `INSERT INTO participation(project_id,member_id) VALUES(${participation.project_id}, ${participation.member_id})`
             )
             return result.insertId
         } catch (err) {
@@ -53,7 +53,7 @@ class Participation {
             connection = await this._pool.getConnection()
 
             const [result] = await connection.query(
-                `DELETE FROM participation WHERE member_id=${participation.member_id} AND team_id=${participation.team_id}`
+                `DELETE FROM participation WHERE member_id=${participation.member_id} AND project_id=${participation.project_id}`
             )
 
             return result.affectedRows > 0

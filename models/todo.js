@@ -15,7 +15,7 @@ class Todo {
         try {
             connection = await this._pool.getConnection()
 
-            const [rows] = await connection.query(`SELECT * FROM todo WHERE id=${tid}`)
+            const [rows] = await connection.query(`SELECT * FROM todo WHERE id=${tid} AND deleted=0`)
 
             if (rows.length == 0)
                 return null
@@ -34,7 +34,7 @@ class Todo {
         try {
             connection = await this._pool.getConnection()
 
-            const [rows] = await connection.query(`SELECT * FROM todo WHERE section_id=${sid}`)
+            const [rows] = await connection.query(`SELECT * FROM todo WHERE section_id=${sid} AND deleted=0`)
 
             return rows
         } catch (err) {
@@ -50,7 +50,7 @@ class Todo {
         try {
             connection = await this._pool.getConnection()
 
-            const [rows] = await connection.query(`SELECT * FROM todo WHERE project_id=${pid}`)
+            const [rows] = await connection.query(`SELECT * FROM todo WHERE project_id=${pid} AND deleted=0`)
 
             return rows
         } catch (err) {
@@ -67,8 +67,8 @@ class Todo {
 
             // TODO: deadline 컬럼 추가
             const [result] = await connection.query(
-                `INSERT INTO todo(title, description, team_id, section_id, project_id, owner, importance) 
-                VALUES('${todo.title}', '${todo.desc}', ${todo.team_id}, ${todo.section_id}, ${todo.project_id}, ${todo.owner}, ${todo.importance})`
+                `INSERT INTO todo(title, description, section_id, project_id, owner, importance) 
+                VALUES('${todo.title}', '${todo.desc}', ${todo.section_id}, ${todo.project_id}, ${todo.owner}, ${todo.importance})`
             )
 
             return result.insertId
@@ -118,8 +118,9 @@ class Todo {
             if(todo_owner[0].owner != member_id)
                 return null
 
+            // `DELETE FROM todo WHERE id=${todo_id}`
             const [result] = await connection.query(
-                `DELETE FROM todo WHERE id=${todo_id}`
+                `UPDATE todo SET deleted=1 WHERE id=${todo_id}`
             )
 
             return result.affectedRows > 0
