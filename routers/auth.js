@@ -5,7 +5,7 @@ const async_handler = require("express-async-handler");
 const uuid4 = require("uuid4");
 const jwt = require("jsonwebtoken");
 
-const appsettings = require("./modules/config");
+const appsettings = require("../modules/config");
 
 const admin = require("firebase-admin");
 const service_account = require("../config/iopm-f7940-firebase-adminsdk-ntf1b-b42b1f00ad.json");
@@ -22,12 +22,9 @@ router.post(
 
     try {
       const decoded_token = await admin.auth().verifyIdToken(id_token);
-      console.log(decoded_token);
       const uid = decoded_token.uid;
 
       if (!uuid4.valid(uid)) throw "유효하지 않습니다";
-
-      console.log(uid);
 
       const access_token = jwt.sign(
         { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": uid },
