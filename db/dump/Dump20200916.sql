@@ -107,14 +107,13 @@ DROP TABLE IF EXISTS `user`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(100) COLLATE euckr_bin NOT NULL,
+  `firebase_uid` varchar(100) COLLATE euckr_bin NOT NULL,
   `email` varchar(100) COLLATE euckr_bin DEFAULT NULL,
-  `password` varchar(200) COLLATE euckr_bin DEFAULT NULL,
   `nickname` varchar(100) COLLATE euckr_bin DEFAULT NULL,
   `phone` varchar(30) COLLATE euckr_bin DEFAULT NULL,
   `photo` varchar(500) COLLATE euckr_bin DEFAULT NULL,
   `last_login` datetime DEFAULT CURRENT_TIMESTAMP,
-  `uuid` varchar(100) COLLATE euckr_bin NOT NULL,
-  `firebase_uid` varchar(100) COLLATE euckr_bin NOT NULL,
   `created_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid_UNIQUE` (`uuid`),
@@ -132,4 +131,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-16 20:27:17
+-- Dump completed on 2020-09-16 21:47:02
