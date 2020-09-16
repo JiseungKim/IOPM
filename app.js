@@ -18,19 +18,20 @@ app.get(
   })
 );
 
-app.use("/auth", require("./routers/auth"));
-app.use("/api/user", require("./routers/api.user"));
-app.use("/api/section", require("./routers/api.section"));
-app.use("/api/participation", require("./routers/api.participation"));
-app.use("/api/project", require("./routers/api.project"));
-app.use("/api/todo", require("./routers/api.todo"));
+app.use("/auth", require("./routers/auth"))
+app.use('/team', require('./routers/team'))
+app.use("/api/user", require("./routers/api.user"))
+app.use("/api/section", require("./routers/api.section"))
+app.use("/api/participation", require("./routers/api.participation"))
+app.use("/api/project", require("./routers/api.project"))
+app.use("/api/todo", require("./routers/api.todo"))
 
 app.get(
   "/",
   async_handler(async (req, res, next) => {
-    res.render("home", { data: { title: "cshyeon" } });
+    res.render("home", { data: { title: "cshyeon" } })
   })
-);
+)
 
 app.listen(appsettings.common.port, () => {
   console.log(`listen to ${appsettings.common.port}..`);
