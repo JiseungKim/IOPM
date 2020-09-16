@@ -1,3 +1,4 @@
+// const cookie_parser = require("cookie-parser");
 const express = require("express");
 const async_handler = require("express-async-handler");
 const appsettings = require("./modules/config");
@@ -6,6 +7,7 @@ const app = express();
 app.set("view engine", "ejs");
 app.use(express.static("./public"));
 app.use(express.json());
+// app.use(cookie_parser);
 
 app.locals.cdn = require("./modules/cdn");
 
