@@ -11,6 +11,11 @@ const service_account = require("../config/iopm-f7940-firebase-adminsdk-ntf1b-b4
 const User = require("../models/user")
 const user = new User()
 
+const CheckValidate = require('../models/authenticator')
+// const authenticator = require('./authenticator')
+
+const check_validate = new CheckValidate()
+
 admin.initializeApp({
     credential: admin.credential.cert(service_account),
     databaseURL: "https://iopm-f7940.firebaseio.com",
@@ -22,55 +27,19 @@ router.post(
         const id_token = req.body.token
 
         try {
-            let user_info = null
 
-            let firebase_uid = null
+            // const payload = await admin.auth().verifyIdToken(id_token)
+            // firebase_uid = payload.uid
 
-            if (appsettings.auth.firebase) {
-                const decoded_token = await admin.auth().verifyIdToken(id_token)
-                firebase_uid = decoded_token.uid
-            } else {
-                firebase_uid = uuid4()
-            }
+            const result = await check_validate.authenticate(id_token)
 
-            const exist = await user.find_by_firebase_uid(firebase_uid)
-
-            if (exist == null) {
-                user_info = { uuid: uuid4(), firebase_uid: firebase_uid }
-                await user.create_uuid(user_info)
-            } else {
-                user_info = exist
-            }
-
-            // jwt 발급
-            const access_token = jwt.sign(
-                {
-                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name":
-                        user_info.uuid,
-                },
-                appsettings.secret_key,
-                {
-                    expiresIn: appsettings.token_expire.access_expire,
-                }
-            )
-            const refresh_token = jwt.sign(
-                {
-                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name":
-                        user_info.uuid,
-                },
-                appsettings.secret_key,
-                {
-                    expiresIn: appsettings.token_expire.refresh_expire,
-                }
-            )
-
-            res.cookie("access_token", access_token, { httpOnly: true })
-            res.cookie("refresh_token", refresh_token, { httpOnly: true })
+            res.cookie("access_token", result.access_token, { httpOnly: true })
+            res.cookie("refresh_token", result.refresh_token, { httpOnly: true })
 
             res.json({
                 success: true,
-                uuid: user_info.uuid,
-                tokens: { access: access_token, refresh: refresh_token },
+                uuid: result.uuid,
+                tokens: { access: result.access_token, refresh: result.refresh_token },
             })
         } catch (err) {
             console.log(err)

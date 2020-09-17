@@ -79,7 +79,8 @@ class User {
             connection = await this._pool.getConnection()
 
             const [result] = await connection.query(
-                `INSERT INTO user(uuid, firebase_uid) VALUES('${user.uuid}', '${user.firebase_uid}')`
+                `INSERT INTO user(uuid, firebase_uid, last_login, created_date)
+                VALUES('${user.uuid}', '${user.firebase_uid}', UTC_TIMESTAMP(), UTC_TIMESTAMP())`
             )
             return result.insertId
         } catch (err) {
@@ -161,7 +162,7 @@ class User {
 
             const [rows] = await connection.query(
                 `SELECT * FROM user
-                                        WHERE email='${user.email}' OR nickname='${user.nickname}'`
+                WHERE email='${user.email}' OR nickname='${user.nickname}'`
             )
 
             for (let row of rows) {
@@ -170,8 +171,8 @@ class User {
             }
 
             const [result] = await connection.query(
-                `INSERT INTO user(email,password,nickname,phone,photo)
-                VALUES('${user.email}','${code}','${user.nickname}','${user.phone}','${user.photo}')`
+                `INSERT INTO user(email,password,nickname,phone,photo,last_login,created_date)
+                VALUES('${user.email}','${code}','${user.nickname}','${user.phone}','${user.photo}',UTC_TIMESTAMP(),UTC_TIMESTAMP())`
             )
             return result.insertId
         } catch (err) {
