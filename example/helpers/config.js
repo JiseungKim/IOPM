@@ -1,1 +1,0 @@
-module.exports = require(`../config/appsettings.${process.env.ENVIRONMENT || 'local'}.json`)
