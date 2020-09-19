@@ -16,11 +16,17 @@ a:visited
 
 .button
 {
+	border: none;
 	color: white;
     background-color: #c0c0c0;
     padding: 3px 10px;
 	cursor: pointer;
 	display: inline-table;
+}
+
+.button:focus
+{
+	outline: none;
 }
 
 body

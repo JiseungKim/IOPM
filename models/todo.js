@@ -44,15 +44,36 @@ class Todo {
         }
     }
 
-    async find_by_project(pid) {
+    async find_by_project(uuid, pname) {
         let connection = null
 
         try {
             connection = await this._pool.getConnection()
+            const [rows] = await connection.query(
+                `
+                SELECT 
+                    section.name AS section, 
+                    todo.title, todo.description, todo.importance, todo.deadline
+                FROM section
+                    LEFT JOIN user ON user.uuid='${uuid}'
+                    LEFT JOIN participation ON user.id = participation.user_id
+                    LEFT JOIN project ON project.id = participation.project_id AND project.name='${pname}'
+                    LEFT JOIN todo ON todo.section_id = section.id
+                WHERE 
+                    project.id IS NOT NULL AND
+                    participation.id IS NOT NULL AND
+                    (todo.deleted=0 OR todo.deleted IS NULL);
+                `
+            )
 
-            const [rows] = await connection.query(`SELECT * FROM todo WHERE project_id=${pid} AND deleted=0`)
+            const hash = {}
+            for (const x of new Set(rows.map(x => x.section)))
+                hash[x] = []
 
-            return rows
+            for (const row of rows.filter(x => x.title != null))
+                hash[row.section].push(row)
+
+            return hash
         } catch (err) {
             throw err
         } finally {

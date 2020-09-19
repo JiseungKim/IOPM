@@ -12,21 +12,24 @@
 <body>
     <%- include('partition/header') %>
     <div id="contents">
+        <div class="config">
+            <button class="button" v-on:click='show_create_section'>Add Section</button>
+        </div>
         <ul class="section-list">
-            <li class="section-item" v-for="section in sections">
-                <div class="title">{{ section.name }}</div>
-                <div class="new-todo" v-on:click='show_create_section'>
+            <li class="section-item" v-for="(todo_list, name) in sections">
+                <div class="title">{{ name }}</div>
+                <div class="new-todo">
                     <img src=<%= cdn("image/plus.png") %> />
                 </div>
                 <ul class="todo-list">
-                    <li class="todo-item" data-aos="flip-up" v-for="todo in section.todo_list">
+                    <li class="todo-item" v-for="todo in todo_list">
                         <div class="title">{{ todo.title }}</div>
-                        <div class="desc">{{ todo.desc }}</div>
+                        <div class="desc">{{ todo.description }}</div>
                         <div class="responsibility">
                             <img class="thumb" src=<%= cdn("image/tyrion.png") %> />
                             <div class="member-desc">
-                                <div class="name">{{ todo.owner.name }}</div>
-                                <div class="desc">{{ todo.owner.desc }}</div>
+                                <div class="name">{{ todo.owner }}</div>
+                                <!-- <div class="desc">{{ todo.owner.desc }}</div> -->
                             </div>
                         </div>
                     </li>
