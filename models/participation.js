@@ -1,6 +1,6 @@
 
 const mysql = require('mysql2/promise')
-const settings = require('../config/appsettings.local.json')
+const settings = require('../modules/config')
 
 class Participation {
     constructor() {
@@ -32,9 +32,9 @@ class Participation {
                 `SELECT * FROM participation WHERE project_id=${participation.project_id} AND user_id=${participation.user_id}`
             )
 
-            if(rows.length > 0)
+            if (rows.length > 0)
                 return null
-            
+
             const [result] = await connection.query(
                 `INSERT INTO participation(project_id,user_id) VALUES(${participation.project_id}, ${participation.user_id})`
             )
@@ -63,7 +63,7 @@ class Participation {
             connection?.release()
         }
     }
-    
+
 }
 
 module.exports = Participation

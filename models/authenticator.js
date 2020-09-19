@@ -2,6 +2,7 @@ const appsettings = require("../modules/config");
 const mysql = require("mysql2/promise")
 const jwt = require("jsonwebtoken")
 const admin = require("firebase-admin")
+const uuid4 = require('uuid4')
 
 class Authenticator {
     constructor() {
@@ -25,9 +26,11 @@ class Authenticator {
         try {
             connection = await this._pool.getConnection()
 
-            const payload = await admin.auth().verifyIdToken(id_token)
+            const { f_uid } = appsettings.auth.firebase ?
+                await admin.auth().verifyIdToken(id_token) :
+                { f_uid: uuid4() }
 
-            const [[user_data]] = await connection.query(`SELECT * FROM user WHERE firebase_uid = '${payload.uid}'`)
+            const [[user_data]] = await connection.query(`SELECT * FROM user WHERE firebase_uid = '${f_uid}'`)
 
             if (user_data === undefined) {
                 uuid = uuid4()
@@ -50,8 +53,6 @@ class Authenticator {
 
             return { uuid: uuid, access_token: access_token, refresh_token: refresh_token, error: null }
         } catch (error) {
-            // if (typeof error != 'string')
-            //     error = JSON.stringify(error)
             return { uuid: uuid, token: null, error: error }
         } finally {
             connection.release()
@@ -66,8 +67,6 @@ class Authenticator {
             if (payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] == null)
                 throw 'invalid name.'
 
-            // if (payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] != 'User')
-            //     throw 'invalid role.'
             return { payload: payload, error: null }
         } catch (err) {
             return { payload: payload, error: err }
@@ -92,4 +91,4 @@ class Authenticator {
     }
 }
 
-module.exports = Authenticator
+module.exports = new Authenticator()

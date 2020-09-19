@@ -3,7 +3,7 @@ new Vue({
     data: {
         showModal: false,
         role: 'members',
-        team: {
+        project: {
             name: 'IOPM',
             desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
         },

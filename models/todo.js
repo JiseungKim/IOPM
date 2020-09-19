@@ -1,6 +1,6 @@
 
 const mysql = require('mysql2/promise')
-const settings = require('../config/appsettings.local.json')
+const settings = require('../modules/config')
 
 // TODO: 정규식
 
@@ -68,7 +68,7 @@ class Todo {
             // 프로젝트 참여 검사
             const [project_user] = await this._pool.query(`SELECT * FROM participation WHERE project_id=${todo.project_id} AND user_id=${user_id}`)
 
-            if(project_user.length == 0)
+            if (project_user.length == 0)
                 return null
 
             // TODO: deadline 컬럼 추가
@@ -90,17 +90,11 @@ class Todo {
         try {
             connection = await this._pool.getConnection()
 
-            // todo의 관리자 찾기
-            const [todo_owner] = await connection.query(`SELECT owner FROM todo WHERE id=${todo_id}`)
-            
-            if(todo_owner[0].owner != user_id)
-                return null
-            
             // TODO: deadline 컬럼 추가
             const [result] = await this._pool.query(
                 `UPDATE todo
                 SET title='${todo.title}', description='${todo.desc}', importance=${todo.importance}, deadline=${todo.deadline}
-                WHERE id=${todo_id}`
+                WHERE id=${todo_id} AND owner=${user_id} AND deleted=0`
             )
 
             return result.affectedRows > 0
@@ -118,17 +112,9 @@ class Todo {
         try {
             connection = await this._pool.getConnection()
 
-            // todo의 관리자 찾기
-            const [todo_owner] = await connection.query(`SELECT owner FROM todo WHERE id=${todo_id}`)
-            
-            if(todo_owner[0].owner != user_id)
-                return null
-
-            // `DELETE FROM todo WHERE id=${todo_id}`
             const [result] = await connection.query(
-                `UPDATE todo SET deleted=1 WHERE id=${todo_id}`
+                `UPDATE todo SET deleted=1 WHERE id=${todo_id} AND owner=${user_id} AND deleted=0`
             )
-
             return result.affectedRows > 0
         } catch (err) {
             throw err

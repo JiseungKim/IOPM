@@ -1,5 +1,5 @@
 const mysql = require("mysql2/promise")
-const settings = require("../config/appsettings.local.json")
+const settings = require("../modules/config")
 
 const sha256 = require("../modules/SHA256")
 // 팀이름 공백, 영문, 한글, 숫자, _ , -만 가능하게 검사하기

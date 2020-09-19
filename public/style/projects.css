@@ -3,14 +3,14 @@
 	max-width: 1024px;
 }
 
-.team-card-list
+.project-card-list
 {
 	display: inline-block;
 	margin: 10px;
 	text-align: center;
 }
 
-.team-card-item
+.project-card-item
 {
 	display: inline-block;
 	padding: 0px 0px;
@@ -24,7 +24,7 @@
 	vertical-align: top;
 }
 
-.team-card-item.create-team-card .top
+.project-card-item.create-project-card .top
 {
 	text-align: center;
 	padding-left: 10px;
@@ -33,7 +33,7 @@
 	align-items: center;
 }
 
-.team-card-item.create-team-card .bottom
+.project-card-item.create-project-card .bottom
 {
 	display: flex;
     justify-content: center;
@@ -44,7 +44,7 @@
     padding: 0px;
 }
 
-.team-card-item .team-icon
+.project-card-item .project-icon
 {
 	position: absolute;
 	top: 35px;
@@ -55,7 +55,7 @@
     width: 42px;
 }
 
-.team-card-item .top
+.project-card-item .top
 {
 	border-bottom: 1px #c0c0c0 solid;
     display: flex;
@@ -66,23 +66,23 @@
     padding-right: 15px;
 }
 
-.team-card-item .bottom
+.project-card-item .bottom
 {
 	padding: 40px 10px 10px 10px;
 }
 
-.team-card-item .bottom .summary
+.project-card-item .bottom .summary
 {
 	color: #c0c0c0;
 }
 
-.team-card-item .bottom .title
+.project-card-item .bottom .title
 {
 	font-weight: bold;
     font-size: 32px;
 }
 
-.team-card-item .bottom .desc
+.project-card-item .bottom .desc
 {
 	color: #c0c0c0;
     font-size: 12px;

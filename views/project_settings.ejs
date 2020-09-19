@@ -3,25 +3,25 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Members</title>
+    <title>Porject Settings</title>
     <%- include('partition/dependency') %>
     <%- include('templates/dialog_confirm') %>
-    <link rel="stylesheet" href=<%= cdn("style/team.settings.css") %>>
+    <link rel="stylesheet" href=<%= cdn("style/project.settings.css") %>>
 </head>
 
 <body>
     <%- include('partition/header') %>
     <div id="contents">
-        <div class="team-header">
-            <div class="team-header-contents">
-                <img class="team-icon" src=<%= cdn("image/tyrion.png") %> />
-                <div class="team-detail">
-                    <div class="team-name">{{ team.name }}</div>
-                    <span class="team-desc">{{ team.desc }}</span>
+        <div class="project-header">
+            <div class="project-header-contents">
+                <img class="project-icon" src=<%= cdn("image/tyrion.png") %> />
+                <div class="project-detail">
+                    <div class="project-name">{{ project.name }}</div>
+                    <span class="project-desc">{{ project.desc }}</span>
                 </div>
             </div>
         </div>
-        <div class="team-contents">
+        <div class="project-contents">
             <div class="tab-navi">
                 <ul class="tab-navi-list">
                     <li class="tab-navi-item" v-bind:active="role=='members'" v-on:click="tab('members')">
@@ -85,7 +85,7 @@
         </div>
         <confirm v-bind:role='role' v-bind:dest='dest' v-if="showModal" @close="showModal=false" v-on:ok="on_success" />
     </div>
-    <script src=<%= cdn("js/team.settings.js") %>></script>
+    <script src=<%= cdn("js/project.settings.js") %>></script>
 </body>
 
 </html>

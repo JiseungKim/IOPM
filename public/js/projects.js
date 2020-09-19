@@ -1,7 +1,7 @@
 new Vue({
-    el: '#teams',
+    el: '#projects',
     data: {
-        teams: [
+        projects: [
             {
                 summary: 'Lorem ipsum',
                 title: 'Lorem ipsum',

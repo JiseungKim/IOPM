@@ -1,6 +1,6 @@
 
 const mysql = require('mysql2/promise')
-const settings = require('../config/appsettings.local.json')
+const settings = require('../modules/config')
 
 // TODO: 정규식
 
@@ -53,8 +53,8 @@ class Project {
             const [project_owner] = await connection.query(
                 `SELECT owner FROM project WHERE id=${project_id}`
             )
-            
-            if(project_owner[0].owner != user_id)
+
+            if (project_owner[0].owner != user_id)
                 throw "관리자가 아닙니다."
 
             // TODO: 프로젝트 이름 정규식
@@ -86,10 +86,10 @@ class Project {
             const [project_owner] = await connection.query(
                 `SELECT owner FROM project WHERE id=${project_id}`
             )
-            
-            if(project_owner[0].owner != user_id)
+
+            if (project_owner[0].owner != user_id)
                 throw "관리자가 아닙니다."
-            
+
             // 섹션 이름 중복 검사
             const [exists] = await connection.query(
                 `SELECT COUNT(*) AS count FROM section
@@ -98,7 +98,7 @@ class Project {
 
             if (exists[0].count > 0)
                 return null
-            
+
             const [result] = await this._pool.query(`UPDATE section SET name='${section.name}' WHERE id=${section_id}`)
 
             return result.affectedRows > 0
@@ -120,8 +120,8 @@ class Project {
             const [project_owner] = await connection.query(
                 `SELECT owner FROM project WHERE id=${project_id}`
             )
-            
-            if(project_owner[0].owner != user_id)
+
+            if (project_owner[0].owner != user_id)
                 return null
 
             const [result] = await connection.query(

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Projects</title>
+    <%- include('partition/dependency') %>
+    <link rel="stylesheet" href=<%= cdn("style/projects.css") %>>
+</head>
+
+<body>
+    <%- include('partition/header') %>
+    <div id="contents">
+        <ul id="projects" class="project-card-list">
+            <li class="project-card-item create-project-card">
+                <div class="top">Create Your Team!</div>
+                <div class="bottom">
+                    <img src=<%= cdn("image/create.png") %> />
+                </div>
+            </li>
+            <li class="project-card-item" data-aos="zoom-in" v-for="project in projects">
+                <a v-bind:href="'project/' + project.title">
+                    <img class="project-icon" src="image/fingerprint.png" />
+                    <div class="top">Lorem Ipsum</div>
+                    <div class="bottom">
+                        <div class="summary">{{ project.summary }}</div>
+                        <div class="title">{{ project.title }}</div>
+                        <div class="desc">{{ project.desc }}</div>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <script src="js/projects.js"></script>
+</body>
+
+</html>

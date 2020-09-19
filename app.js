@@ -1,7 +1,7 @@
 const express = require("express");
 const async_handler = require("express-async-handler");
 const appsettings = require("./modules/config");
-const middleware = require("./models/middleware")
+const auth_middleware = require("./middlewares/authenticate")
 const cookie_parser = require('cookie-parser')
 
 const app = express();
@@ -14,17 +14,17 @@ app.locals.cdn = require("./modules/cdn");
 
 
 app.get(
-    "/",
-    async_handler(async (req, res, next) => {
-        res.render("home");
-    })
+  "/",
+  async_handler(async (req, res, next) => {
+    res.render("home");
+  })
 );
 
 app.use("/auth", require("./routers/auth"));
 
-app.use(middleware)
+app.use(auth_middleware)
 
-app.use("/team", require('./routers/team'))
+app.use("/project", require('./routers/project'))
 app.use("/api/user", require("./routers/api.user"));
 app.use("/api/section", require("./routers/api.section"));
 app.use("/api/participation", require("./routers/api.participation"));
@@ -33,5 +33,5 @@ app.use("/api/todo", require("./routers/api.todo"));
 
 
 app.listen(appsettings.common.port, () => {
-    console.log(`listen to ${appsettings.common.port}..`);
+  console.log(`listen to ${appsettings.common.port}..`);
 });

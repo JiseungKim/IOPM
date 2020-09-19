@@ -1,19 +1,16 @@
 const appsettings = require('../modules/config')
-const jwt = require("jsonwebtoken")
-const uuid4 = require("uuid4")
 const async_handler = require('express-async-handler')
-const Authenticator = require('./authenticator')
-
-const authenticator = new Authenticator()
+const authenticator = require('../models/authenticator')
 
 const middleware = async_handler(async (req, res, next) => {
 
-    console.log("refresh_token :", req.cookies.refresh_token)
-    console.log("access_token :", req.cookies.access_token)
-
     try {
-        let access_token = req.cookies.refresh_token
-        let refresh_token = req.cookies.refresh_token
+        let access_token =
+            req.cookies.access_token ||
+            req.headers.access_token
+        let refresh_token =
+            req.cookies.refresh_token ||
+            req.headers.refresh_token
 
         // refresh token 만료 검증
         const { payload: refresh_payload, error: refresh_err } = await authenticator.validate(req.cookies.refresh_token)

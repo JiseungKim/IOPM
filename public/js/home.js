@@ -42,7 +42,7 @@ window.onload = () => {
                 if (response.data.success == false)
                     throw response.error
 
-                window.location.href = '/team'
+                window.location.href = '/project'
             }
         }
     })

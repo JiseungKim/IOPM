@@ -1,4 +1,4 @@
-img.team-icon
+img.project-icon
 {
     width: 84px;
     height: 84px;
@@ -6,26 +6,26 @@ img.team-icon
     margin-right: 20px;
 }
 
-.team-header {
+.project-header {
     background-color: #f4f5f7;
     display: flex;
     justify-content: center;
 }
 
-.team-header-contents
+.project-header-contents
 {
     display: flex;
     justify-content: center;
     padding: 30px 0px;
 }
 
-.team-name
+.project-name
 {
     font-size: 24px;
     font-weight: bold;
 }
 
-.team-contents
+.project-contents
 {
     margin: 0px auto;
     width: 1024px;
