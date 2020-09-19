@@ -71,7 +71,41 @@ class Authenticator {
         } catch (err) {
             return { payload: payload, error: err }
         }
+    }
 
+    async assert(access, refresh) {
+        // refresh token 만료 검증
+        const { payload: refresh_payload, error: refresh_err } = await this.validate(refresh)
+
+
+        if (refresh_err) {
+            if (refresh_err.name == "TokenExpiredError")
+                throw "refresh token이 만료되었습니다."
+            else
+                throw "올바르지 않은 token입니다."
+        }
+
+        const uuid = refresh_payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]
+        if (uuid == null)
+            throw 'invalid uuid.'
+
+        // access token 만료 검증
+        const { payload: access_payload, error: access_err } = await this.validate(access)
+
+        if (access_err) {
+            if (access_err.name == "TokenExpiredError") {
+                // 재발행
+                access = this.issue(uuid, appsettings.token_expire.access_expire)
+                refresh = this.issue(uuid, appsettings.token_expire.refresh_expire)
+
+                res.cookie('access_token', access, { httpOnly: true })
+                res.cookie('refresh_token', refresh, { httpOnly: true })
+            } else {
+                throw "올바르지 않은 token 입니다."
+            }
+        }
+
+        return { access: access, refresh: refresh, uuid: uuid }
     }
 
     async jwt(uuid, ttl) {
