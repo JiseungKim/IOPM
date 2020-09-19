@@ -30,7 +30,7 @@ class Project {
         try {
             connection = await this._pool.getConnection()
 
-            const [[row]] = await connection.query(`SELECT * FROM project WHERE owner=${user_id}`)
+            const [[row]] = await connection.query(`SELECT * FROM project WHERE owner='${user_id}'`)
             return row
         } catch (err) {
             throw err
@@ -46,9 +46,12 @@ class Project {
             connection = await this._pool.getConnection()
 
             const [rows] = await connection.query(
-                `SELECT * FROM project
-                JOIN (SELECT project_id FROM participation WHERE user_id=${user_id}) as PTCP
-                ON project.id = PTCP.project_id;`
+                `
+                SELECT * FROM project
+                    LEFT JOIN user ON user.uuid='${user_id}'
+                    LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
+                WHERE participation.id IS NOT NULL;
+                `
             )
 
             return rows
@@ -59,7 +62,7 @@ class Project {
         }
     }
 
-    async add(project, user_id) {
+    async add(name, desc, user_id) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
@@ -68,17 +71,29 @@ class Project {
             // 자신이 만든 프로젝트에 중복된 팀 이름이 있는지 검사
             const [[exists]] = await connection.query(
                 `SELECT COUNT(*) AS count FROM project
-                WHERE name='${project.name}' AND owner=${user_id}`
+                WHERE name='${name}' AND owner='${user_id}'`
             )
 
             if (exists.count > 0)
                 return null
 
-            const [result] = await connection.query(
-                `INSERT INTO project(name,owner) VALUES('${project.name}', ${user_id})`
+            const [[user]] = await connection.query(
+                `SELECT id FROM user WHERE uuid='${user_id}' LIMIT 1`
             )
 
-            return result.insertId
+            const [result] = await connection.query(
+                `INSERT INTO project(name, \`desc\`, owner, created_date) VALUES('${name}', '${desc}', ${user.id}, UTC_TIMESTAMP())`
+            )
+
+            await connection.query(
+                `INSERT INTO participation(project_id, user_id) VALUES(${result.insertId}, ${user.id})`
+            )
+
+            return {
+                id: result.insertId,
+                name: name,
+                desc: desc
+            }
         } catch (err) {
             throw err
         } finally {
@@ -92,7 +107,7 @@ class Project {
             connection = await this._pool.getConnection()
 
             const [result] = await this._pool.query(
-                `UPDATE project SET name=${project.name} WHERE id=${project_id} AND owner=${user_id}`
+                `UPDATE project SET name=${project.name} WHERE id=${project_id} AND owner='${user_id}'`
             )
 
             return result.affectedRows > 0
@@ -109,7 +124,7 @@ class Project {
         try {
             connection = await this._pool.getConnection()
             const [result] = await connection.query(
-                `DELETE FROM project WHERE id=${project_id} AND owner=${user_id}`
+                `DELETE FROM project WHERE id=${project_id} AND owner='${user_id}'`
             )
 
             return result.affectedRows > 0

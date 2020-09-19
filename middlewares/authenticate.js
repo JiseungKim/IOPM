@@ -17,7 +17,7 @@ const middleware = async_handler(async (req, res, next) => {
 
     } catch (err) {
         console.log(err)
-        res.json({ success: false, error: err })
+        res.redirect('/')
     }
 })
 module.exports = middleware

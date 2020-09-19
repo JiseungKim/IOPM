@@ -7,6 +7,21 @@ const uuid4 = require('uuid4')
 class Authenticator {
     constructor() {
         this._pool = mysql.createPool(appsettings.database)
+        this._cache = []
+
+        let connection = null
+        this._pool.getConnection()
+            .then(x => {
+                connection = x
+                return x.query(`SELECT uuid FROM user`)
+            })
+            .then(x => {
+                const [rows] = x
+                this._cache = rows.map(x => x.uuid)
+            })
+            .then(() => {
+                connection?.release()
+            })
     }
 
     async issue(uuid, time) {
@@ -26,9 +41,9 @@ class Authenticator {
         try {
             connection = await this._pool.getConnection()
 
-            const { f_uid } = appsettings.auth.firebase ?
+            const { uid: f_uid } = appsettings.auth.firebase ?
                 await admin.auth().verifyIdToken(id_token) :
-                { f_uid: uuid4() }
+                { uid: uuid4() }
 
             const [[user_data]] = await connection.query(`SELECT * FROM user WHERE firebase_uid = '${f_uid}'`)
 
@@ -38,6 +53,7 @@ class Authenticator {
                     `INSERT INTO user(uuid, firebase_uid, last_login, created_date)
                     VALUES('${uuid}', '${f_uid}', UTC_TIMESTAMP(), UTC_TIMESTAMP())`
                 )
+                this._cache.push(uuid)
             } else {
                 uuid = user_data.uuid
             }
@@ -66,6 +82,9 @@ class Authenticator {
 
             if (payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] == null)
                 throw 'invalid name.'
+
+            if (this._cache.includes(payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]) == false)
+                throw 'invalid use.'
 
             return { payload: payload, error: null }
         } catch (err) {
@@ -97,9 +116,6 @@ class Authenticator {
                 // 재발행
                 access = this.issue(uuid, appsettings.token_expire.access_expire)
                 refresh = this.issue(uuid, appsettings.token_expire.refresh_expire)
-
-                res.cookie('access_token', access, { httpOnly: true })
-                res.cookie('refresh_token', refresh, { httpOnly: true })
             } else {
                 throw "올바르지 않은 token 입니다."
             }

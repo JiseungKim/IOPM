@@ -5,14 +5,15 @@
     <meta charset="utf-8">
     <title>Projects</title>
     <%- include('partition/dependency') %>
+    <%- include('templates/create_project_dialog') %>
     <link rel="stylesheet" href=<%= cdn("style/projects.css") %>>
 </head>
 
 <body>
     <%- include('partition/header') %>
     <div id="contents">
-        <ul id="projects" class="project-card-list">
-            <li class="project-card-item create-project-card">
+        <ul class="project-card-list">
+            <li class="project-card-item create-project-card" v-on:click='show_create_popup'>
                 <div class="top">Create Your Team!</div>
                 <div class="bottom">
                     <img src=<%= cdn("image/create.png") %> />
@@ -21,17 +22,19 @@
             <li class="project-card-item" data-aos="zoom-in" v-for="project in projects">
                 <a v-bind:href="'project/' + project.title">
                     <img class="project-icon" src="image/fingerprint.png" />
-                    <div class="top">Lorem Ipsum</div>
+                    <div class="top">Activated</div>
                     <div class="bottom">
-                        <div class="summary">{{ project.summary }}</div>
-                        <div class="title">{{ project.title }}</div>
+                        <div class="summary">Private</div>
+                        <div class="title">{{ project.name }}</div>
                         <div class="desc">{{ project.desc }}</div>
                     </div>
                 </a>
             </li>
         </ul>
+        <create_project v-if="show_create_project_dialog" @close="show_create_project_dialog=false"
+            v-bind:title='create_params.title' v-bind:desc='create_params.desc' v-on:ok="create_project" />
     </div>
-    <script src="js/projects.js"></script>
+    <script src=<%= cdn("js/projects.js") %>></script>
 </body>
 
 </html>

@@ -1,0 +1,95 @@
+<script type="text/x-template" id="create_project_template">
+    <transition name="create_project">
+        <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div class="create-project-container">
+                    
+                    <div class="caption">
+                        <div class="title">Confirm</div>
+                    </div>
+                    
+                    <div class="contents">
+                        <input type="text" name="title" v-model='project_title' placeholder="Project title" />
+                        <textarea name="desc" rows="10" v-model='project_desc' placeholder="Project description" />
+                        <div class="buttons">
+                            <button class="no" @click="$emit('close')">NO</button>
+                            <button class="yes" v-bind:title='project_title' v-bind:desc='project_desc' v-on:click="$emit('ok', {title: $event.target.attributes.title.value, desc: $event.target.attributes.desc.value})">YES</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </transition>
+</script>
+
+<script>
+    Vue.component('create_project', {
+        props: ['title', 'desc'],
+        data: function () {
+            return {
+                project_title: this.title,
+                project_desc: this.desc
+            }
+        },
+        template: '#create_project_template'
+    })
+</script>
+
+
+<style>
+    .create-project-container {
+        margin: 0 auto;
+        width: 600px;
+    }
+
+    .create-project-container .caption {
+        color: white;
+        background-color: black;
+        padding: 10px 20px;
+    }
+
+    .create-project-container .contents {
+        background-color: white;
+        color: #a0a0a0;
+        display: flex;
+        flex-direction: column;
+        padding: 30px 25px;
+    }
+
+    .create-project-container .contents input {
+        padding: 10px 10px;
+        width: 80%;
+    }
+
+    .create-project-container .contents input:focus,
+    .create-project-container .contents textarea {
+        outline: none;
+    }
+
+    .create-project-container .contents input[name=title] {
+        margin-bottom: 20px;
+    }
+
+    .create-project-container .contents textarea[name=desc] {
+        height: 150px;
+        resize: none;
+    }
+
+    .create-project-container .contents .buttons {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    .create-project-container .contents .buttons>button {
+        background-color: white;
+        border: none;
+        outline: 1px #c0c0c0 solid;
+        padding: 5px 10px;
+        margin-left: 10px;
+    }
+
+    .create-project-container .contents .buttons>button:focus {
+        outline: 1px black solid;
+    }
+</style>

@@ -33,9 +33,9 @@ router.get('/find_by_owner/:uid', async_handler(async (req, res, next) => {
 }))
 
 // 가입한 프로젝트 검색
-router.get('/find_by_user/:uid', async_handler(async (req, res, next) => {
+router.get('/get', async_handler(async (req, res, next) => {
     try {
-        const found = await project.find_by_user(req.params.uid)
+        const found = await project.find_by_user(req.headers.uuid)
         res.json({ success: true, projects: found })
     } catch (err) {
         console.error(err)
@@ -47,12 +47,12 @@ router.get('/find_by_user/:uid', async_handler(async (req, res, next) => {
 router.post('/make', async_handler(async (req, res, next) => {
     // TODO: 팀의 관리자만 생성 가능
     try {
-        const pid = await project.add(req.body.project, req.body.user_id)
+        const data = await project.add(req.body.title, req.body.desc, req.headers.uuid)
 
-        if (pid == null)
+        if (data == null)
             throw "프로젝트 이름이 중복됩니다"
 
-        res.json({ success: true, project_id: pid })
+        res.json({ success: true, project: data })
     } catch (err) {
         console.error(err)
         res.json({ success: false, error: err })
@@ -61,7 +61,7 @@ router.post('/make', async_handler(async (req, res, next) => {
 
 router.post('/update/:pid', async_handler(async (req, res, next) => {
     try {
-        const success = await project.update(req.body.project, req.body.user_id, req.params.pid)
+        const success = await project.update(req.body.project, req.headers.uuid, req.params.pid)
 
         if (success == null)
             throw "프로젝트 이름이 중복됩니다"
@@ -75,7 +75,7 @@ router.post('/update/:pid', async_handler(async (req, res, next) => {
 
 router.post('/remove/:pid', async_handler(async (req, res, next) => {
     try {
-        const success = await project.remove(req.params.pid, req.body.user_id)
+        const success = await project.remove(req.params.pid, req.headers.uuid)
 
         if (success == null)
             throw "관리자가 아닙니다."
