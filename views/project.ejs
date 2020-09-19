@@ -5,16 +5,17 @@
     <meta charset="utf-8">
     <title>Project</title>
     <%- include('partition/dependency') %>
+    <%- include('templates/create_section_dialog') %>
     <link rel="stylesheet" href=<%= cdn("style/project.css") %>>
 </head>
 
 <body>
     <%- include('partition/header') %>
     <div id="contents">
-        <ul id="sections" class="section-list">
+        <ul class="section-list">
             <li class="section-item" v-for="section in sections">
-                <div class="title">{{ section.title }}</div>
-                <div class="new-todo">
+                <div class="title">{{ section.name }}</div>
+                <div class="new-todo" v-on:click='show_create_section'>
                     <img src=<%= cdn("image/plus.png") %> />
                 </div>
                 <ul class="todo-list">
@@ -32,6 +33,8 @@
                 </ul>
             </li>
         </ul>
+        <create_section v-if="show_create_section_dialog" @close="show_create_section_dialog=false"
+            v-bind:title='create_params.title' v-on:ok="create_section" />
     </div>
     <script src=<%= cdn("js/project.js") %>></script>
 </body>

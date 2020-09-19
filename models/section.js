@@ -28,13 +28,22 @@ class Project {
         }
     }
 
-    async find_by_project(project_id) {
+    async find_by_project(uuid, project_id) {
         let connection = null
 
         try {
             connection = await this._pool.getConnection()
 
-            const [rows] = await connection.query(`SELECT * FROM section WHERE project_id=${project_id}`)
+            // 해당 유저의 프로젝트 참여 여부도 체크해야 하므로 JOIN 필요
+            const [rows] = await connection.query(
+                `
+                SELECT section.name FROM section
+                    LEFT JOIN user ON user.uuid='${uuid}'
+                    LEFT JOIN project ON project.name='${project_id}'
+                    LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
+                WHERE participation.id IS NOT NULL
+                `
+            )
 
             return rows
         } catch (err) {
@@ -44,31 +53,35 @@ class Project {
         }
     }
 
-    async add(section, user_id, project_id) {
+    async add(name, uuid, project_name) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
 
-            // team의 관리자 찾기
-            const [project_owner] = await connection.query(
-                `SELECT owner FROM project WHERE id=${project_id}`
+            const [[user]] = await connection.query(
+                `SELECT id FROM user WHERE uuid='${uuid}' LIMIT 1`
             )
+            if (user == null)
+                throw `invalid user id : ${uuid}`
 
-            if (project_owner[0].owner != user_id)
-                throw "관리자가 아닙니다."
-
-            // TODO: 프로젝트 이름 정규식
-            // 팀 내에 중복된 이름의 섹션 존재하는지 검사
-            const [exists] = await connection.query(
-                `SELECT * FROM section
-                WHERE name='${section.name}' AND project_id=${project_id}`
+            const [[project]] = await connection.query(
+                `SELECT * FROM project WHERE owner=${user.id} AND name='${project_name}' LIMIT 1`
             )
+            if (project == null)
+                throw `cannot find any matched project, name : '${project_name}'.`
 
-            if (exists.length > 0)
-                return null
+            const [[exists]] = await connection.query(
+                `SELECT COUNT(*) AS count FROM section WHERE project_id=${project.id} AND name='${name}'`
+            )
+            if (exists.count > 0)
+                throw `'${name}' is already exists.`
 
-            const [result] = await connection.query(`INSERT INTO section(project_id,name) VALUES(${project_id},'${section.name}')`)
-
+            const [result] = await connection.query(
+                `
+                INSERT INTO section(project_id, name, created_date) 
+                VALUES(${project.id}, '${name}', UTC_TIMESTAMP())
+                `
+            )
             return result.insertId
         } catch (err) {
             throw err

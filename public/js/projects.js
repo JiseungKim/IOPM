@@ -2,6 +2,10 @@ new Vue({
     el: '#contents',
     data: {
         show_create_project_dialog: false,
+        create_params: {
+            title: '',
+            desc: ''
+        },
         role: 'members',
         projects: [
             {
@@ -44,11 +48,7 @@ new Vue({
                 name: 'Lorem ipsum',
                 desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
             }
-        ],
-        create_params: {
-            title: '',
-            desc: ''
-        }
+        ]
     },
 
     mounted: async function () {
@@ -94,7 +94,6 @@ new Vue({
                 if (response.data.success == false)
                     throw response.data.error
 
-                console.log(response.data)
                 this.projects.push({
                     summary: 'Lorem ipsum',
                     name: response.data.project.name,
