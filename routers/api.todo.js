@@ -41,12 +41,12 @@ router.get('/find_by_project/:pname', async_handler(async (req, res, next) => {
 
 router.post('/make', async_handler(async (req, res, next) => {
     try {
-        const tid = await todo.add(req.body.todo, req.body.user_id)
+        const tid = await todo.add(req.headers.uuid, req.body.section, req.body.title, req.body.desc)
 
         if (tid == null)
             throw "참여자가 아닙니다."
 
-        res.json({ success: true, todo_id: tid })
+        res.json({ success: true, todo: { id: tid, title: req.body.title, desc: req.body.desc } })
     } catch (err) {
         console.log(err)
         res.json({ success: false, error: err })

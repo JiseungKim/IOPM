@@ -1,12 +1,6 @@
 new Vue({
     el: '#contents',
     data: {
-        show_create_project_dialog: false,
-        create_params: {
-            title: '',
-            desc: ''
-        },
-        role: 'members',
         projects: [
             {
                 summary: 'Lorem ipsum',
@@ -68,39 +62,75 @@ new Vue({
     },
 
     methods: {
-        show_create_popup: async function () {
-            this.show_create_project_dialog = true
-            this.create_params.title = 'sample title'
-            this.create_params.desc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+        $request_create_project: async function (title, desc) {
+            return await this.$http.post
+                (
+                    'api/project/make',
+                    {
+                        title: title,
+                        desc: desc
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                )
         },
 
-        create_project: async function (data) {
-            this.show_create_project_dialog = false
-            this.create_params.title = ''
-            this.create_params.desc = ''
+        $update_created_project: function (id, name, desc) {
+            this.projects.push({
+                summary: `Lorem ipsum_${id}`,
+                name: name,
+                desc: desc
+            })
+        },
 
-            try {
-                const response = await this.$http.post
-                    (
-                        'api/project/make',
-                        data,
-                        {
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        }
-                    )
+        show_create_popup: async function () {
+            const handle_request = this.$request_create_project
+            const handle_update = this.$update_created_project
 
-                if (response.data.success == false)
-                    throw response.data.error
+            const result = await swal.fire({
+                title: '섹션을 추가합니다..ㅎ',
+                html:
+                    '<input id="project-title" class="swal2-input" placeholder="Title">' +
+                    '<input id="project-desc" class="swal2-input" placeholder="Description">',
+                showCancelButton: true,
+                confirmButtonText: 'Register',
+                showLoaderOnConfirm: true,
+                preConfirm: async () => {
 
-                this.projects.push({
-                    summary: 'Lorem ipsum',
-                    name: response.data.project.name,
-                    desc: response.data.project.desc
+                    try {
+                        const title = document.getElementById('project-title').value
+                        if (title.length == 0)
+                            throw 'project title cannot be empty.'
+
+                        const desc = document.getElementById('project-desc').value
+                        if (desc.length == 0)
+                            throw 'project description cannot be empty.'
+
+                        return handle_request(title, desc)
+                    } catch (e) {
+                        swal.showValidationMessage(`Request failed : ${e}`)
+                    }
+                },
+                allowOutsideClick: () => !swal.isLoading()
+            })
+
+            const response = result.value.body
+            if (response.success) {
+                handle_update(response.project.id, response.project.name, response.project.desc)
+                swal.fire({
+                    icon: 'success',
+                    title: 'Request success',
+                    text: `You create project '${response.project.name}'.`
                 })
-            } catch (e) {
-                alert(e)
+            } else {
+                swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Request failed. Check message : ${response.error}`
+                })
             }
         }
     }

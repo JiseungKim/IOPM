@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <title>Project</title>
     <%- include('partition/dependency') %>
-    <%- include('templates/create_section_dialog') %>
     <link rel="stylesheet" href=<%= cdn("style/project.css") %>>
 </head>
 
@@ -16,13 +15,13 @@
             <button class="button" v-on:click='show_create_section'>Add Section</button>
         </div>
         <ul class="section-list">
-            <li class="section-item" v-for="(todo_list, name) in sections">
-                <div class="title">{{ name }}</div>
-                <div class="new-todo">
+            <li class="section-item" v-for="section in sections" v-bind:section_id='section.id'>
+                <div class="title">{{ section.name }}</div>
+                <div class="new-todo" v-on:click='show_create_todo(section.id)'>
                     <img src=<%= cdn("image/plus.png") %> />
                 </div>
                 <ul class="todo-list">
-                    <li class="todo-item" v-for="todo in todo_list">
+                    <li class="todo-item" v-for="todo in section.todo_list">
                         <div class="title">{{ todo.title }}</div>
                         <div class="desc">{{ todo.description }}</div>
                         <div class="responsibility">
@@ -36,8 +35,9 @@
                 </ul>
             </li>
         </ul>
-        <create_section v-if="show_create_section_dialog" @close="show_create_section_dialog=false"
-            v-bind:title='create_params.title' v-on:ok="create_section" />
+        <!-- <create_todo v-if="show_create_todo_dialog" @close="show_create_todo_dialog=false" v-on:ok="create_section" /> -->
+        <!-- <create_section v-if="show_create_section_dialog" @close="show_create_section_dialog=false"
+            v-bind:title='create_params.title' v-on:ok="create_section" /> -->
     </div>
     <script src=<%= cdn("js/project.js") %>></script>
 </body>

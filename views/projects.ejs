@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <title>Projects</title>
     <%- include('partition/dependency') %>
-    <%- include('templates/create_project_dialog') %>
     <link rel="stylesheet" href=<%= cdn("style/projects.css") %>>
 </head>
 
@@ -31,8 +30,6 @@
                 </a>
             </li>
         </ul>
-        <create_project v-if="show_create_project_dialog" @close="show_create_project_dialog=false"
-            v-bind:title='create_params.title' v-bind:desc='create_params.desc' v-on:ok="create_project" />
     </div>
     <script src=<%= cdn("js/projects.js") %>></script>
 </body>

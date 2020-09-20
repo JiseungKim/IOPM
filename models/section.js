@@ -37,11 +37,12 @@ class Project {
             // 해당 유저의 프로젝트 참여 여부도 체크해야 하므로 JOIN 필요
             const [rows] = await connection.query(
                 `
-                SELECT section.name FROM section
+                SELECT section.id, section.name FROM section
                     LEFT JOIN user ON user.uuid='${uuid}'
                     LEFT JOIN project ON project.name='${project_id}'
                     LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
                 WHERE participation.id IS NOT NULL
+                ORDER BY section.created_date
                 `
             )
 

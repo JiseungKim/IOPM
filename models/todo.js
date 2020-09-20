@@ -51,29 +51,37 @@ class Todo {
             connection = await this._pool.getConnection()
             const [rows] = await connection.query(
                 `
-                SELECT 
-                    section.name AS section, 
+                SELECT
+                    section.id AS id, section.name AS name,
                     todo.title, todo.description, todo.importance, todo.deadline
                 FROM section
                     LEFT JOIN user ON user.uuid='${uuid}'
-                    LEFT JOIN participation ON user.id = participation.user_id
-                    LEFT JOIN project ON project.id = participation.project_id AND project.name='${pname}'
-                    LEFT JOIN todo ON todo.section_id = section.id
+                    LEFT JOIN participation ON user.id=participation.user_id
+                    LEFT JOIN project ON project.id=section.project_id AND project.id=participation.project_id AND project.name='${pname}'
+                    LEFT JOIN todo ON todo.section_id=section.id
                 WHERE 
                     project.id IS NOT NULL AND
                     participation.id IS NOT NULL AND
-                    (todo.deleted=0 OR todo.deleted IS NULL);
+                    (todo.deleted=0 OR todo.deleted IS NULL)
+                ORDER BY section.created_date
                 `
             )
 
             const hash = {}
-            for (const x of new Set(rows.map(x => x.section)))
+            for (const x of new Set(rows.map(x => `${x.id}:${x.name}`)))
                 hash[x] = []
 
             for (const row of rows.filter(x => x.title != null))
-                hash[row.section].push(row)
+                hash[`${row.id}:${row.name}`].push(row)
 
-            return hash
+            return Object.entries(hash).map(([key, value]) => {
+                const [id, name] = key.split(':')
+                return {
+                    id: id,
+                    name: name,
+                    todo_list: value
+                }
+            })
         } catch (err) {
             throw err
         } finally {
@@ -81,21 +89,34 @@ class Todo {
         }
     }
 
-    async add(todo, user_id) {
+    async add(user_id, section_id, title, desc) {
         let connection = null
         try {
             connection = await this._pool.getConnection()
 
             // 프로젝트 참여 검사
-            const [project_user] = await this._pool.query(`SELECT * FROM participation WHERE project_id=${todo.project_id} AND user_id=${user_id}`)
-
-            if (project_user.length == 0)
+            // const [project_user] = await this._pool.query(`SELECT * FROM participation WHERE project_id=${todo.project_id} AND user_id=${user_id}`)
+            const [[exists]] = await connection.query(
+                `
+                SELECT user.id AS uid FROM participation
+                    LEFT JOIN user ON user.uuid='${user_id}' AND user.id=participation.user_id
+                    LEFT JOIN project ON project.id=participation.project_id
+                    LEFT JOIN section ON section.project_id=project.id AND section.id=${section_id}
+                WHERE 
+                    user.id IS NOT NULL AND
+                    section.id IS NOT NULL AND
+                    project.id IS NOT NULL;
+                `
+            )
+            if (exists == null)
                 return null
 
             // TODO: deadline 컬럼 추가
             const [result] = await connection.query(
-                `INSERT INTO todo(title, description, section_id, project_id, owner, importance, deadline) 
-                VALUES('${todo.title}', '${todo.desc}', ${todo.section_id}, ${todo.project_id}, ${todo.owner}, ${todo.importance}, ${todo.deadline})`
+                `
+                INSERT INTO todo(title, description, section_id, owner, created_date, importance, deadline)
+                VALUES('${title}', '${desc}', ${section_id}, ${exists.uid}, UTC_TIMESTAMP(), 0, UTC_TIMESTAMP())
+                `
             )
 
             return result.insertId
