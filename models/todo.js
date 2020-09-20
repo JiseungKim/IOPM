@@ -49,11 +49,25 @@ class Todo {
 
         try {
             connection = await this._pool.getConnection()
+            const [[result]] = await connection.query(
+                `
+                SELECT 
+                    COUNT(*) AS mine
+                FROM user
+                    LEFT JOIN project ON project.name='${pname}' AND project.owner=user.id
+                WHERE 
+                    user.uuid='${uuid}'
+                LIMIT 1
+                `
+            )
+            const mine = !!result.mine
+
             const [rows] = await connection.query(
                 `
                 SELECT
                     section.id AS id, section.name AS name,
-                    todo.title, todo.description, todo.importance, todo.deadline
+                    todo.title, todo.description, todo.importance, todo.deadline,
+                    todo.owner=user.id AS mine
                 FROM section
                     LEFT JOIN user ON user.uuid='${uuid}'
                     LEFT JOIN participation ON user.id=participation.user_id
@@ -74,7 +88,7 @@ class Todo {
             for (const row of rows.filter(x => x.title != null))
                 hash[`${row.id}:${row.name}`].push(row)
 
-            return Object.entries(hash).map(([key, value]) => {
+            const sections = Object.entries(hash).map(([key, value]) => {
                 const [id, name] = key.split(':')
                 return {
                     id: id,
@@ -82,6 +96,11 @@ class Todo {
                     todo_list: value
                 }
             })
+
+            return {
+                mine: mine,
+                sections: sections
+            }
         } catch (err) {
             throw err
         } finally {

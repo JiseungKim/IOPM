@@ -64,6 +64,9 @@
     font-weight: bold;
     margin-bottom: 10px;
     font-size: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .todo-list .todo-item .responsibility

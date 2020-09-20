@@ -47,7 +47,10 @@ class Project {
 
             const [rows] = await connection.query(
                 `
-                SELECT * FROM project
+                SELECT 
+                    project.name, project.desc, 
+                    project.owner=user.id AS mine
+                FROM project
                     LEFT JOIN user ON user.uuid='${user_id}'
                     LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
                 WHERE participation.id IS NOT NULL;

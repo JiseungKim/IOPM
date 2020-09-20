@@ -31,8 +31,8 @@ router.get('/find_by_section/:sid', async_handler(async (req, res, next) => {
 // 특정 project에 속한 todo 찾기
 router.get('/find_by_project/:pname', async_handler(async (req, res, next) => {
     try {
-        const sections = await todo.find_by_project(req.headers.uuid, req.params.pname)
-        res.json({ success: true, sections: sections })
+        const data = await todo.find_by_project(req.headers.uuid, req.params.pname)
+        res.json({ success: true, mine: data.mine, sections: data.sections })
     } catch (err) {
         console.log(err)
         res.json({ success: false, error: err })

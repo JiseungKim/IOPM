@@ -19,9 +19,11 @@
                 </div>
             </li>
             <li class="project-card-item" data-aos="zoom-in" v-for="project in projects">
+                <div class="top">
+                    <img v-show='project.mine' src=<%= cdn("image/recycle_bin.png") %> />
+                </div>
                 <a v-bind:href="'project/' + project.name">
                     <img class="project-icon" src="image/fingerprint.png" />
-                    <div class="top">Activated</div>
                     <div class="bottom">
                         <div class="summary">Private</div>
                         <div class="title">{{ project.name }}</div>

@@ -12,7 +12,7 @@
     <%- include('partition/header') %>
     <div id="contents">
         <div class="config">
-            <button class="button" v-on:click='show_create_section'>Add Section</button>
+            <button class="button" v-show='mine' v-on:click='show_create_section'>Add Section</button>
         </div>
         <ul class="section-list">
             <li class="section-item" v-for="section in sections" v-bind:section_id='section.id'>
@@ -22,7 +22,10 @@
                 </div>
                 <ul class="todo-list">
                     <li class="todo-item" v-for="todo in section.todo_list">
-                        <div class="title">{{ todo.title }}</div>
+                        <div class="title">
+                            <div>{{ todo.title }}</div>
+                            <img v-show='todo.mine' src=<%= cdn("image/recycle_bin.png") %> />
+                        </div>
                         <div class="desc">{{ todo.description }}</div>
                         <div class="responsibility">
                             <img class="thumb" src=<%= cdn("image/tyrion.png") %> />

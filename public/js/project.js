@@ -12,6 +12,7 @@ function current_project_name() {
 new Vue({
     el: '#contents',
     data: {
+        mine: false,
         sections: {}
     },
     mounted: async function () {
@@ -30,7 +31,7 @@ new Vue({
                 throw response.data.error
 
             this.sections = response.data.sections
-            console.log(this.sections)
+            this.mine = response.data.mine
         } catch (e) {
             alert(e)
         }
