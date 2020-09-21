@@ -30,6 +30,9 @@
 .section-list .section-item > .title {
     font-weight: bold;
     font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .section-list .section-item > .new-todo {
@@ -38,6 +41,7 @@
     display: flex;
     justify-content: center;
     margin-bottom: 10px;
+    cursor: pointer;
 }
 
 .section-list .section-item > .new-todo > img

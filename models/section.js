@@ -124,22 +124,21 @@ class Project {
         }
     }
 
-    async remove(section_id, user_id, project_id) {
+    async remove(section_id, user_id) {
         let connection = null
 
         try {
             connection = await this._pool.getConnection()
-
-            // team의 관리자 찾기
-            const [project_owner] = await connection.query(
-                `SELECT owner FROM project WHERE id=${project_id}`
-            )
-
-            if (project_owner[0].owner != user_id)
-                return null
-
             const [result] = await connection.query(
-                `DELETE FROM section WHERE id=${section_id}`
+                `
+                DELETE section FROM section
+                    LEFT JOIN user ON user.uuid='${user_id}'
+                    LEFT JOIN project ON project.id=section.project_id
+                    LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
+                WHERE 
+                    section.id=${section_id} AND 
+                    project.owner=user.id
+                `
             )
 
             return result.affectedRows > 0
@@ -149,7 +148,6 @@ class Project {
             connection?.release()
         }
     }
-
 }
 
 module.exports = Project

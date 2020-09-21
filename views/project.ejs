@@ -16,7 +16,10 @@
         </div>
         <ul class="section-list">
             <li class="section-item" v-for="section in sections" v-bind:section_id='section.id'>
-                <div class="title">{{ section.name }}</div>
+                <div class="title">
+                    <div>{{ section.name }}</div>
+                    <img v-on:click='remove_section(section.id)' src=<%= cdn("image/recycle_bin.png") %> />
+                </div>
                 <div class="new-todo" v-on:click='show_create_todo(section.id)'>
                     <img src=<%= cdn("image/plus.png") %> />
                 </div>
@@ -24,7 +27,8 @@
                     <li class="todo-item" v-for="todo in section.todo_list">
                         <div class="title">
                             <div>{{ todo.title }}</div>
-                            <img v-show='todo.mine' src=<%= cdn("image/recycle_bin.png") %> />
+                            <img v-show='todo.mine' v-on:click='remove_todo(todo.tid)'
+                                src=<%= cdn("image/recycle_bin.png") %> />
                         </div>
                         <div class="desc">{{ todo.description }}</div>
                         <div class="responsibility">

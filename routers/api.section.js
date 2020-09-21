@@ -56,7 +56,7 @@ router.post('/update/:sid', async_handler(async (req, res, next) => {
 
 router.post('/remove/:sid', async_handler(async (req, res, next) => {
     try {
-        const success = await section.remove(req.params.sid, req.body.user_id, req.body.project_id)
+        const success = await section.remove(req.params.sid, req.headers.uuid)
 
         if (success == null)
             throw "관리자가 아닙니다."

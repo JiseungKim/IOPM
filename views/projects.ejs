@@ -20,7 +20,8 @@
             </li>
             <li class="project-card-item" data-aos="zoom-in" v-for="project in projects">
                 <div class="top">
-                    <img v-show='project.mine' src=<%= cdn("image/recycle_bin.png") %> />
+                    <img v-on:click='remove(project.id)' v-show='project.mine'
+                        src=<%= cdn("image/recycle_bin.png") %> />
                 </div>
                 <a v-bind:href="'project/' + project.name">
                     <img class="project-icon" src="image/fingerprint.png" />

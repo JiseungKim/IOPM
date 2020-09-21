@@ -65,8 +65,9 @@ class Todo {
             const [rows] = await connection.query(
                 `
                 SELECT
-                    section.id AS id, section.name AS name,
-                    todo.title, todo.description, todo.importance, todo.deadline,
+                    project.id AS pid,
+                    section.id AS sid, section.name AS name,
+                    todo.id AS tid, todo.title, todo.description, todo.importance, todo.deadline,
                     todo.owner=user.id AS mine
                 FROM section
                     LEFT JOIN user ON user.uuid='${uuid}'
@@ -82,11 +83,11 @@ class Todo {
             )
 
             const hash = {}
-            for (const x of new Set(rows.map(x => `${x.id}:${x.name}`)))
+            for (const x of new Set(rows.map(x => `${x.sid}:${x.name}`)))
                 hash[x] = []
 
             for (const row of rows.filter(x => x.title != null))
-                hash[`${row.id}:${row.name}`].push(row)
+                hash[`${row.sid}:${row.name}`].push(row)
 
             const sections = Object.entries(hash).map(([key, value]) => {
                 const [id, name] = key.split(':')
@@ -174,7 +175,15 @@ class Todo {
             connection = await this._pool.getConnection()
 
             const [result] = await connection.query(
-                `UPDATE todo SET deleted=1 WHERE id=${todo_id} AND owner=${user_id} AND deleted=0`
+                `
+                DELETE todo FROM todo
+                    LEFT JOIN user ON user.uuid='${user_id}'
+                    LEFT JOIN section ON section.id=todo.section_id
+                    LEFT JOIN project ON project.id=section.project_id
+                    LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
+                WHERE 
+                    todo.id=${todo_id} AND todo.owner=user.id;
+                `
             )
             return result.affectedRows > 0
         } catch (err) {
@@ -183,7 +192,6 @@ class Todo {
             connection?.release()
         }
     }
-
 }
 
 module.exports = Todo

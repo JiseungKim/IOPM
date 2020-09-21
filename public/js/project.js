@@ -12,6 +12,7 @@ function current_project_name() {
 new Vue({
     el: '#contents',
     data: {
+        project: 0,
         mine: false,
         sections: {}
     },
@@ -30,6 +31,7 @@ new Vue({
             if (response.data.success == false)
                 throw response.data.error
 
+            console.log(response.data)
             this.sections = response.data.sections
             this.mine = response.data.mine
         } catch (e) {
@@ -82,13 +84,57 @@ new Vue({
             if (found == null)
                 throw 'unknown exception'
 
-            console.log(found)
             found.todo_list.push({
                 id: id,
                 title: title,
-                description: desc
+                description: desc,
+                mine: true
             })
             console.log(found.todo_list)
+        },
+
+        $request_remove_todo: async function (id) {
+            return await this.$http.post
+                (
+                    `../api/todo/remove/${id}`,
+                    {},
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                )
+        },
+
+        $update_remove_todo: function (id) {
+            for (let section of this.sections) {
+                const found = section.todo_list.findIndex(x => x.tid == id)
+                if (found == -1)
+                    continue
+
+                section.todo_list.splice(found, 1)
+                return true
+            }
+            return false
+        },
+
+        $request_remove_section: async function (id) {
+            return await this.$http.post
+                (
+                    `../api/section/remove/${id}`,
+                    {},
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                )
+        },
+
+        $update_remove_section: function (id) {
+            const found = this.sections.findIndex(x => x.id == id)
+            if (found != -1)
+                this.sections.splice(found, 1)
         },
 
         show_create_section: async function () {
@@ -160,6 +206,83 @@ new Vue({
                 },
                 allowOutsideClick: () => !swal.isLoading()
             })
+        },
+
+        remove_section: async function (id) {
+            const handle_request = this.$request_remove_section
+            const handle_update = this.$update_remove_section
+            let response = null
+
+            const result = await swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                showLoaderOnConfirm: true,
+                preConfirm: async () => {
+                    response = await handle_request(id)
+                },
+                allowOutsideClick: () => !swal.isLoading()
+            })
+            if (result.value == false)
+                return
+
+            if (response.body.success) {
+                handle_update(id)
+                await swal.fire({
+                    icon: 'success',
+                    title: 'Remove success',
+                    text: `-_ㅡ`
+                })
+            } else {
+                swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Request failed. Check message : ${response.error}`
+                })
+            }
+        },
+
+        remove_todo: async function (id) {
+
+            const handle_request = this.$request_remove_todo
+            const handle_update = this.$update_remove_todo
+            let response = null
+
+            const result = await swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                showLoaderOnConfirm: true,
+                preConfirm: async () => {
+                    response = await handle_request(id)
+                },
+                allowOutsideClick: () => !swal.isLoading()
+            })
+            if (result.value == false)
+                return
+
+            if (response.body.success) {
+                handle_update(id)
+                await swal.fire({
+                    icon: 'success',
+                    title: 'Remove success',
+                    text: `-_ㅡ`
+                })
+            } else {
+                swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Request failed. Check message : ${response.error}`
+                })
+            }
         }
     }
 })

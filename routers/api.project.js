@@ -80,7 +80,7 @@ router.post('/remove/:pid', async_handler(async (req, res, next) => {
         if (success == null)
             throw "관리자가 아닙니다."
 
-        res.json({ success: success })
+        res.json({ success: success, id: req.params.pid })
     } catch (err) {
         console.error(err)
         res.json({ success: false, error: err })

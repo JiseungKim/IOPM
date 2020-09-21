@@ -82,8 +82,29 @@ new Vue({
             this.projects.push({
                 summary: `Lorem ipsum_${id}`,
                 name: name,
-                desc: desc
+                desc: desc,
+                mine: true
             })
+        },
+
+        $request_remove_project: async function (id) {
+            return await this.$http.post
+                (
+                    `api/project/remove/${id}`,
+                    {},
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                )
+        },
+
+        $update_remove_project: function (id) {
+
+            const found = this.projects.findIndex(x => x.id == id)
+            if (found != -1)
+                this.projects.splice(found, 1)
         },
 
         show_create_popup: async function () {
@@ -124,6 +145,45 @@ new Vue({
                     icon: 'success',
                     title: 'Request success',
                     text: `You create project '${response.project.name}'.`
+                })
+            } else {
+                swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Request failed. Check message : ${response.error}`
+                })
+            }
+        },
+
+        remove: async function (id) {
+            const handle_request = this.$request_remove_project
+            const handle_update = this.$update_remove_project
+            let response = null
+
+            const result = await swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                showLoaderOnConfirm: true,
+                preConfirm: async () => {
+                    response = await handle_request(id)
+                },
+                allowOutsideClick: () => !swal.isLoading()
+            })
+            if (result.value == false)
+                return
+
+            console.log(response)
+            if (response.body.success) {
+                handle_update(id)
+                await swal.fire({
+                    icon: 'success',
+                    title: 'Remove success',
+                    text: `-_ㅡ`
                 })
             } else {
                 swal.fire({

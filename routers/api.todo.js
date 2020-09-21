@@ -69,7 +69,7 @@ router.post('/update/:tid', async_handler(async (req, res, next) => {
 
 router.post('/remove/:tid', async_handler(async (req, res, next) => {
     try {
-        const success = await todo.remove(req.params.tid, req.body.user_id)
+        const success = await todo.remove(req.params.tid, req.headers.uuid)
 
         if (success == null)
             throw "관리자가 아닙니다."

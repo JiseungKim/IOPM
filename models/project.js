@@ -48,7 +48,7 @@ class Project {
             const [rows] = await connection.query(
                 `
                 SELECT 
-                    project.name, project.desc, 
+                    project.id, project.name, project.desc, 
                     project.owner=user.id AS mine
                 FROM project
                     LEFT JOIN user ON user.uuid='${user_id}'
@@ -127,7 +127,13 @@ class Project {
         try {
             connection = await this._pool.getConnection()
             const [result] = await connection.query(
-                `DELETE FROM project WHERE id=${project_id} AND owner='${user_id}'`
+                `
+                DELETE P FROM project as P
+                    LEFT JOIN user ON user.uuid='${user_id}' AND p.owner=user.id
+                WHERE
+                    p.id=${project_id} AND
+                    user.id IS NOT NULL
+                `
             )
 
             return result.affectedRows > 0
