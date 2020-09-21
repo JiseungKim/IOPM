@@ -46,6 +46,9 @@ new Vue({
     },
 
     mounted: async function () {
+        console.log(this.$cookies.get('photo'))
+        console.log(this.$cookies.get('email'))
+        console.log(this.$cookies.get('name'))
         const response = await this.$http.get
             (
                 'api/project/get',

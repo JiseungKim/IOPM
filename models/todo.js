@@ -68,22 +68,22 @@ class Todo {
 
             const [rows] = await connection.query(
                 `
-                SELECT
+                SELECT 
                     project.id AS pid,
                     section.id AS sid, section.name AS name,
                     todo.id AS tid, todo.title, todo.description, todo.importance, todo.deadline,
                     user.photo, user.email,
                     user.uuid='${uuid}' AS mine
-                FROM todo
+                FROM section
                     JOIN user
-                    LEFT JOIN section ON section.id=todo.section_id
+                    LEFT JOIN todo ON todo.section_id=section.id AND todo.owner=user.id
                     LEFT JOIN project ON project.id=section.project_id AND project.name='${pname}'
                     LEFT JOIN participation ON participation.project_id=project.id AND participation.user_id=user.id
                 WHERE
-                    todo.owner=user.id AND
                     participation.id IS NOT NULL AND
                     (todo.deleted=0 OR todo.deleted IS NULL)
-                ORDER BY todo.created_date
+                GROUP BY todo.id
+                ORDER BY section.created_date, todo.created_date
                 `
             )
 

@@ -92,7 +92,7 @@ router.post('/invite', async_handler(async (req, res, next) => {
     try {
         await project.invite(req.body.name, req.headers.uuid, req.body.email)
 
-        mail.send('boyism80@gmail.com', 'title...', 'good')
+        mail.send(req.body.email, 'title...', 'good')
         res.json({ success: true })
     } catch (e) {
         console.error(e)

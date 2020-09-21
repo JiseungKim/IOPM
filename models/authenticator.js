@@ -45,7 +45,7 @@ class Authenticator {
                 await admin.auth().verifyIdToken(data.token) :
                 { uid: uuid4() }
 
-            const [[user_data]] = await connection.query(`SELECT * FROM user WHERE firebase_uid = '${f_uid}'`)
+            let [[user_data]] = await connection.query(`SELECT * FROM user WHERE firebase_uid = '${f_uid}'`)
 
             if (user_data === undefined) {
                 uuid = uuid4()
@@ -54,22 +54,26 @@ class Authenticator {
                     VALUES('${uuid}', '${f_uid}', '${data.email}', '${data.name}', '${data.photo}', UTC_TIMESTAMP(), UTC_TIMESTAMP())`
                 )
                 this._cache.push(uuid)
-            } else {
-                uuid = user_data.uuid
+                user_data = {
+                    uuid: uuid,
+                    email: data.email,
+                    name: data.name,
+                    photo: data.photo
+                }
             }
 
             const access_token = await this.issue(
-                uuid,
+                user_data.uuid,
                 appsettings.token_expire.access_expire
             )
             const refresh_token = await this.issue(
-                uuid,
+                user_data.uuid,
                 appsettings.token_expire.refresh_expire
             )
 
-            return { uuid: uuid, access_token: access_token, refresh_token: refresh_token, error: null }
+            return { data: data, access_token: access_token, refresh_token: refresh_token, error: null }
         } catch (error) {
-            return { uuid: uuid, token: null, error: error }
+            return { data: null, token: null, error: error }
         } finally {
             connection.release()
         }

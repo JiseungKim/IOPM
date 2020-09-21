@@ -23,6 +23,9 @@ router.post(
 
             res.cookie("access_token", result.access_token, { httpOnly: true })
             res.cookie("refresh_token", result.refresh_token, { httpOnly: true })
+            res.cookie('name', result.data.name)
+            res.cookie('email', result.data.email)
+            res.cookie('photo', result.data.photo)
 
             res.json({
                 success: true,
@@ -35,5 +38,11 @@ router.post(
         }
     })
 )
+
+router.post('/sign-out', async_handler(async (req, res, next) => {
+    res.clearCookie('access_token')
+    res.clearCookie('refresh_token')
+    res.json({ success: true })
+}))
 
 module.exports = router

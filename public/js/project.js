@@ -20,7 +20,7 @@ new Vue({
         try {
             const response = await this.$http.get
                 (
-                    `../api/todo/find_by_project/${current_project_name()}`,
+                    `/api/todo/find_by_project/${current_project_name()}`,
                     {
                         headers: {
                             'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ new Vue({
         $request_create_section: async function (name) {
             return await this.$http.post
                 (
-                    '../api/section/make',
+                    '/api/section/make',
                     {
                         name: name,
                         project: current_project_name()
@@ -63,7 +63,7 @@ new Vue({
         $request_create_todo: async function (title, desc, section) {
             return await this.$http.post
                 (
-                    '../api/todo/make',
+                    '/api/todo/make',
                     {
                         title: title,
                         desc: desc,
@@ -96,7 +96,7 @@ new Vue({
         $request_remove_todo: async function (id) {
             return await this.$http.post
                 (
-                    `../api/todo/remove/${id}`,
+                    `/api/todo/remove/${id}`,
                     {},
                     {
                         headers: {
@@ -121,7 +121,7 @@ new Vue({
         $request_remove_section: async function (id) {
             return await this.$http.post
                 (
-                    `../api/section/remove/${id}`,
+                    `/api/section/remove/${id}`,
                     {},
                     {
                         headers: {
@@ -140,7 +140,7 @@ new Vue({
         $request_invite_user: async function (email) {
             return await this.$http.post
                 (
-                    `../api/project/invite`,
+                    `/api/project/invite`,
                     {
                         name: current_project_name(),
                         email: email
