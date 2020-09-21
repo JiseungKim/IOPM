@@ -17,7 +17,7 @@ router.post(
 
         try {
 
-            const result = await authenticator.authenticate(id_token)
+            const result = await authenticator.authenticate(req.body)
             if (result.error)
                 throw result.error
 

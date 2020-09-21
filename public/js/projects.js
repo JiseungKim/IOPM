@@ -158,7 +158,6 @@ new Vue({
         remove: async function (id) {
             const handle_request = this.$request_remove_project
             const handle_update = this.$update_remove_project
-            let response = null
 
             const result = await swal.fire({
                 title: 'Are you sure?',
@@ -170,14 +169,12 @@ new Vue({
                 confirmButtonText: 'Yes, delete it!',
                 showLoaderOnConfirm: true,
                 preConfirm: async () => {
-                    response = await handle_request(id)
+                    return await handle_request(id)
                 },
                 allowOutsideClick: () => !swal.isLoading()
             })
-            if (result.value == false)
-                return
 
-            console.log(response)
+            const response = result.value
             if (response.body.success) {
                 handle_update(id)
                 await swal.fire({

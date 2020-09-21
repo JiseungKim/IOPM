@@ -126,15 +126,29 @@ class Project {
 
         try {
             connection = await this._pool.getConnection()
-            const [result] = await connection.query(
+
+            let [[result]] = await connection.query(
                 `
-                DELETE P FROM project as P
-                    LEFT JOIN user ON user.uuid='${user_id}' AND p.owner=user.id
-                WHERE
-                    p.id=${project_id} AND
-                    user.id IS NOT NULL
+                SELECT 
+                    user.id AS uid, 
+                    project.id AS pid,
+                    user.id=project.owner AS mine 
+                FROM project
+                    LEFT JOIN participation ON participation.project_id=project.id
+                    LEFT JOIN user ON user.id=participation.user_id AND user.uuid='${user_id}'
+                WHERE 
+                    project.id=${project_id} AND
+                    user.id IS NOT NULL;
                 `
             )
+
+            if (result == null)
+                throw 'Not participated.'
+
+            if (result.mine)
+                [result] = await connection.query(`DELETE FROM project WHERE id=${result.pid}`)
+            else
+                [result] = await connection.query(`DELETE FROM participation WHERE project_id=${result.pid} AND user_id=${result.uid}`)
 
             return result.affectedRows > 0
         } catch (err) {
@@ -144,6 +158,46 @@ class Project {
         }
     }
 
+    async invite(name, user_id, email) {
+        let connection = null
+
+        try {
+            connection = await this._pool.getConnection()
+            const [[project]] = await connection.query(
+                `
+                SELECT project.id AS id FROM project
+                    LEFT JOIN user ON user.uuid='${user_id}'
+                    LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
+                WHERE
+                    project.name='${name}' AND project.owner=user.id
+                `
+            )
+
+            if (project == null)
+                throw `Cannot invite user '${email}'. You don't have any priviliges.`
+
+            const [[candidate]] = await connection.query(
+                `
+                SELECT user.id FROM user
+                    LEFT JOIN participation ON participation.project_id=${project.id} AND participation.user_id=user.id
+                WHERE 
+                    user.email='${email}' AND
+                    participation.id IS NULL
+                `
+            )
+
+            if (candidate == null)
+                throw `Cannot invite user. '${email}' is not valid or already participated.`
+
+            const [result] = await connection.query(`INSERT INTO participation(project_id, user_id) VALUES(${project.id}, ${candidate.id})`)
+
+            return result.affectedRows > 0
+        } catch (err) {
+            throw err
+        } finally {
+            connection?.release()
+        }
+    }
 }
 
 module.exports = Project

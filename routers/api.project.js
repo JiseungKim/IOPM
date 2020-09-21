@@ -2,6 +2,7 @@ const { Router } = require('express')
 const router = Router()
 const async_handler = require('express-async-handler')
 const Project = require('../models/project')
+const mail = require('../modules/mail')
 
 const project = new Project()
 
@@ -84,6 +85,18 @@ router.post('/remove/:pid', async_handler(async (req, res, next) => {
     } catch (err) {
         console.error(err)
         res.json({ success: false, error: err })
+    }
+}))
+
+router.post('/invite', async_handler(async (req, res, next) => {
+    try {
+        await project.invite(req.body.name, req.headers.uuid, req.body.email)
+
+        mail.send('boyism80@gmail.com', 'title...', 'good')
+        res.json({ success: true })
+    } catch (e) {
+        console.error(e)
+        res.json({ success: false, error: e })
     }
 }))
 

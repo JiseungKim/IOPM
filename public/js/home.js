@@ -29,7 +29,12 @@ new Vue({
             const response = await this.$http.post
                 (
                     'auth/authenticate',
-                    { token: token },
+                    {
+                        token: token,
+                        photo: result.user.photoURL || result.additionalUserInfo.profile.picture,
+                        email: result.user.email || result.additionalUserInfo.profile.email,
+                        name: result.user.displayName
+                    },
                     {
                         headers: {
                             'Content-Type': 'application/json'

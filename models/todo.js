@@ -51,15 +51,19 @@ class Todo {
             connection = await this._pool.getConnection()
             const [[result]] = await connection.query(
                 `
-                SELECT 
-                    COUNT(*) AS mine
-                FROM user
-                    LEFT JOIN project ON project.name='${pname}' AND project.owner=user.id
-                WHERE 
-                    user.uuid='${uuid}'
+                SELECT
+                    project.owner=user.id AS mine
+                FROM project
+                    LEFT JOIN user ON user.uuid='${uuid}'
+                    LEFT JOIN participation ON participation.project_id=project.id AND participation.user_id=user.id
+                WHERE                 
+                    project.name='${pname}'
                 LIMIT 1
                 `
             )
+            if (result == null)
+                throw 'not participated.'
+
             const mine = !!result.mine
 
             const [rows] = await connection.query(
@@ -68,17 +72,18 @@ class Todo {
                     project.id AS pid,
                     section.id AS sid, section.name AS name,
                     todo.id AS tid, todo.title, todo.description, todo.importance, todo.deadline,
-                    todo.owner=user.id AS mine
-                FROM section
-                    LEFT JOIN user ON user.uuid='${uuid}'
-                    LEFT JOIN participation ON user.id=participation.user_id
-                    LEFT JOIN project ON project.id=section.project_id AND project.id=participation.project_id AND project.name='${pname}'
-                    LEFT JOIN todo ON todo.section_id=section.id
-                WHERE 
-                    project.id IS NOT NULL AND
+                    user.photo, user.email,
+                    user.uuid='${uuid}' AS mine
+                FROM todo
+                    JOIN user
+                    LEFT JOIN section ON section.id=todo.section_id
+                    LEFT JOIN project ON project.id=section.project_id AND project.name='${pname}'
+                    LEFT JOIN participation ON participation.project_id=project.id AND participation.user_id=user.id
+                WHERE
+                    todo.owner=user.id AND
                     participation.id IS NOT NULL AND
                     (todo.deleted=0 OR todo.deleted IS NULL)
-                ORDER BY section.created_date
+                ORDER BY todo.created_date
                 `
             )
 

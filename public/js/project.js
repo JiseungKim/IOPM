@@ -137,6 +137,22 @@ new Vue({
                 this.sections.splice(found, 1)
         },
 
+        $request_invite_user: async function (email) {
+            return await this.$http.post
+                (
+                    `../api/project/invite`,
+                    {
+                        name: current_project_name(),
+                        email: email
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                )
+        },
+
         show_create_section: async function () {
             const handle_request = this.$request_create_section
             const handle_update = this.$update_created_section
@@ -274,6 +290,39 @@ new Vue({
                 await swal.fire({
                     icon: 'success',
                     title: 'Remove success',
+                    text: `-_ㅡ`
+                })
+            } else {
+                swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Request failed. Check message : ${response.error}`
+                })
+            }
+        },
+
+        show_invite_popup: async function () {
+            const handle_request = this.$request_invite_user
+            const result = await swal.fire({
+                title: 'Invite to your project',
+                input: 'text',
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Look up',
+                showLoaderOnConfirm: true,
+                preConfirm: async (email) => {
+                    return handle_request(email)
+                },
+                allowOutsideClick: () => !swal.isLoading()
+            })
+
+            const response = result.value.body
+            if (response.success) {
+                await swal.fire({
+                    icon: 'success',
+                    title: 'Invite success',
                     text: `-_ㅡ`
                 })
             } else {

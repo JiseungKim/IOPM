@@ -34,7 +34,7 @@ class Authenticator {
         return result.jwt
     }
 
-    async authenticate(id_token) {
+    async authenticate(data) {
         let connection = null
 
         let uuid = null
@@ -42,7 +42,7 @@ class Authenticator {
             connection = await this._pool.getConnection()
 
             const { uid: f_uid } = appsettings.auth.firebase ?
-                await admin.auth().verifyIdToken(id_token) :
+                await admin.auth().verifyIdToken(data.token) :
                 { uid: uuid4() }
 
             const [[user_data]] = await connection.query(`SELECT * FROM user WHERE firebase_uid = '${f_uid}'`)
@@ -50,8 +50,8 @@ class Authenticator {
             if (user_data === undefined) {
                 uuid = uuid4()
                 connection.query(
-                    `INSERT INTO user(uuid, firebase_uid, last_login, created_date)
-                    VALUES('${uuid}', '${f_uid}', UTC_TIMESTAMP(), UTC_TIMESTAMP())`
+                    `INSERT INTO user(uuid, firebase_uid, email, nickname, photo, last_login, created_date)
+                    VALUES('${uuid}', '${f_uid}', '${data.email}', '${data.name}', '${data.photo}', UTC_TIMESTAMP(), UTC_TIMESTAMP())`
                 )
                 this._cache.push(uuid)
             } else {
