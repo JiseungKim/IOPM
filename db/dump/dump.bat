@@ -1,11 +1,10 @@
 @ECHO OFF
-SET NOW=%DATE:~0,4%%DATE:~5,2%%DATE:~8,2%
-SET FNAME=Dump%NOW%.sql
+SET FNAME=latest.sql
 
 ECHO MYSQL DATABASE DUMP TOOL MADE BY INOUT TEAM
-mysqldump.exe --user=io  --password=admin --host=localhost --protocol=tcp --port=3306 --default-character-set=utf8 --no-data --skip-triggers --result-file="%FNAME%" "io"
+mysqldump.exe --user=io --password=admin --host=localhost --protocol=tcp --port=3306 --default-character-set=utf8 --no-data --skip-triggers --result-file=%FNAME% --add-drop-database --databases "io"
 ECHO.
 ECHO.
 ECHO.
-ECHO 'DUMP COMPLETE : %FNAME%'
-pause
+ECHO DUMP COMPLETE : %FNAME%
+PAUSE

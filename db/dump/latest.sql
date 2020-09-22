@@ -16,6 +16,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Current Database: `io`
+--
+
+/*!40000 DROP DATABASE IF EXISTS `io`*/;
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `io` /*!40100 DEFAULT CHARACTER SET euckr COLLATE euckr_bin */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `io`;
+
+--
 -- Table structure for table `participation`
 --
 
@@ -133,7 +143,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `uuid_UNIQUE` (`uuid`),
   UNIQUE KEY `firebase_uid_UNIQUE` (`firebase_uid`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -145,4 +155,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-22  2:19:34
+-- Dump completed on 2020-09-22 23:21:13
