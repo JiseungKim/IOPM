@@ -17,6 +17,7 @@
     "http-proxy-middleware": "^1.0.5",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.2.5",
+    "redis": "^3.0.2",
     "uuid4": "^2.0.2"
   }
 }

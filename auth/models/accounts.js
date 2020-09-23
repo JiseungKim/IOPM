@@ -1,12 +1,18 @@
 const appsettings = require("../modules/config");
 const mysql = require("mysql2/promise")
 const uuid4 = require('uuid4')
+const redis = require('redis')
 
 class Accounts {
     constructor() {
         this.$pool = mysql.createPool(appsettings.database)
-        this.$cache = {}
+        this.$redis = redis.createClient(appsettings.redis)
         this.$round_robin_index = 0
+
+        this.$redis_key = {
+            host: (uuid) => `${uuid}:host`,
+            pending: (uuid) => `${uuid}:pending`
+        }
 
         this.$init()
     }
@@ -22,8 +28,9 @@ class Accounts {
         let connection = null
         try {
             connection = await this.$pool.getConnection()
-            const [rows] = connection.query('SELECT uuid FROM user')
-            this.$cache = rows.map(x => x.uuid)
+            const [rows] = await connection.query('SELECT uuid, host FROM user')
+            for (let row of rows)
+                this.$host(row.uuid, row.host)
         } catch (e) {
 
         } finally {
@@ -50,7 +57,7 @@ class Accounts {
                 )
             }
             await connection.commit()
-            this.$cache[user.uuid] = user
+            await this.$host(user.uuid, user.host)
             return { user: user, created: !empty }
         } catch (e) {
             await connection?.rollback()
@@ -60,12 +67,31 @@ class Accounts {
     }
 
     async endpoint(uuid) {
+        const endpoints = appsettings.endpoints[await this.host(uuid)]
+        return endpoints[Math.floor(Math.random() * endpoints.length)]
+    }
+
+    async $host(uuid, host) {
         return new Promise((resolve, reject) => {
             try {
-                const host = this.$cache[uuid].host
-                const endpoints = appsettings.endpoints[host]
-                const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)]
-                resolve(endpoint)
+                this.$redis.set(this.$redis_key.host(uuid), host, () => {
+                    resolve(true)
+                })
+            } catch (e) {
+                reject(e)
+            }
+        })
+    }
+
+    async host(uuid) {
+        return new Promise((resolve, reject) => {
+            try {
+                this.$redis.get(this.$redis_key.host(uuid), (error, value) => {
+                    if (error)
+                        reject(error)
+                    else
+                        resolve(value)
+                })
             } catch (e) {
                 reject(e)
             }

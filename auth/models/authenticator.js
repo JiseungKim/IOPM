@@ -48,7 +48,7 @@ class Authenticator {
             if (uuid == null)
                 throw 'invalid name.'
 
-            if (accounts.$cache[uuid] == false)
+            if (accounts.host(uuid) == null)
                 throw 'invalid user.'
 
             return { payload: payload, error: null }
