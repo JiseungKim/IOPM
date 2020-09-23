@@ -1,0 +1,40 @@
+<div id="header">
+    <a href='/' class="title">
+        <img class="logo" src=<%= cdn("image/icon.png") %> />
+        <div>
+            <div class="project-name">IOPM</div>
+            <div class="project-desc">Project Management tool made by Insider & Outsider</div>
+        </div>
+    </a>
+    <div class="side-tab">
+        <img v-bind:src='photo' class="photo" v-on:click='logout' />
+    </div>
+</div>
+
+<script>
+    new Vue({
+        el: '#header',
+        computed: {
+            name: () => this.$cookies.get('name'),
+            email: () => this.$cookies.get('email'),
+            photo: () => this.$cookies.get('photo')
+        },
+        methods: {
+            logout: async function () {
+                const response = await this.$http.post
+                    (
+                        '/auth/sign-out',
+                        {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        }
+                    )
+                if (response.body.success)
+                    window.location = '/'
+                else
+                    alert(response.body.error)
+            }
+        }
+    })
+</script>

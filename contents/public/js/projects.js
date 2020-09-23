@@ -61,7 +61,7 @@ new Vue({
 
         if (response.body.success)
             this.projects = response.body.projects
-        console.log(this.projects)
+        console.log(response)
     },
 
     methods: {

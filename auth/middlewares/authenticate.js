@@ -15,8 +15,8 @@ const middleware = async_handler(async (req, res, next) => {
         req.headers.uuid = uuid
         next()
 
-    } catch (err) {
-        console.log(err)
+    } catch (e) {
+        console.error(e)
         res.redirect('/')
     }
 })

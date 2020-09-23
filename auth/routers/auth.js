@@ -13,19 +13,17 @@ admin.initializeApp({
 router.post(
     "/authenticate",
     async_handler(async (req, res, next) => {
-        const id_token = req.body.token
 
         try {
-
             const result = await authenticator.authenticate(req.body)
             if (result.error)
                 throw result.error
 
             res.cookie("access_token", result.access_token, { httpOnly: true })
             res.cookie("refresh_token", result.refresh_token, { httpOnly: true })
-            res.cookie('name', result.data.name)
-            res.cookie('email', result.data.email)
-            res.cookie('photo', result.data.photo)
+            res.cookie('name', result.user.name)
+            res.cookie('email', result.user.email)
+            res.cookie('photo', result.user.photo)
 
             res.json({
                 success: true,

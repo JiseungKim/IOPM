@@ -1,28 +1,10 @@
 const appsettings = require("../modules/config");
-const mysql = require("mysql2/promise")
 const jwt = require("jsonwebtoken")
 const admin = require("firebase-admin")
 const uuid4 = require('uuid4')
+const accounts = require('../models/accounts')
 
 class Authenticator {
-    constructor() {
-        this._pool = mysql.createPool(appsettings.database)
-        this._cache = []
-
-        let connection = null
-        this._pool.getConnection()
-            .then(x => {
-                connection = x
-                return x.query(`SELECT uuid FROM user`)
-            })
-            .then(x => {
-                const [rows] = x
-                this._cache = rows.map(x => x.uuid)
-            })
-            .then(() => {
-                connection?.release()
-            })
-    }
 
     async issue(uuid, time) {
 
@@ -35,47 +17,24 @@ class Authenticator {
     }
 
     async authenticate(data) {
-        let connection = null
-
-        let uuid = null
         try {
-            connection = await this._pool.getConnection()
-
             const { uid: f_uid } = appsettings.auth.firebase ?
                 await admin.auth().verifyIdToken(data.token) :
                 { uid: uuid4() }
 
-            let [[user_data]] = await connection.query(`SELECT * FROM user WHERE firebase_uid = '${f_uid}'`)
-
-            if (user_data === undefined) {
-                uuid = uuid4()
-                connection.query(
-                    `INSERT INTO user(uuid, firebase_uid, email, nickname, photo, last_login, created_date)
-                    VALUES('${uuid}', '${f_uid}', '${data.email}', '${data.name}', '${data.photo}', UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-                )
-                this._cache.push(uuid)
-                user_data = {
-                    uuid: uuid,
-                    email: data.email,
-                    name: data.name,
-                    photo: data.photo
-                }
-            }
-
+            const { user } = await accounts.get(f_uid, data)
             const access_token = await this.issue(
-                user_data.uuid,
+                user.uuid,
                 appsettings.token_expire.access_expire
             )
             const refresh_token = await this.issue(
-                user_data.uuid,
+                user.uuid,
                 appsettings.token_expire.refresh_expire
             )
 
-            return { data: data, access_token: access_token, refresh_token: refresh_token, error: null }
+            return { user: user, access_token: access_token, refresh_token: refresh_token, error: null }
         } catch (error) {
-            return { data: null, token: null, error: error }
-        } finally {
-            connection.release()
+            return { user: null, token: null, error: error }
         }
     }
 
@@ -84,11 +43,13 @@ class Authenticator {
         try {
             payload = await jwt.verify(token, appsettings.secret_key)
 
-            if (payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] == null)
+            const uuid = payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]
+
+            if (uuid == null)
                 throw 'invalid name.'
 
-            if (this._cache.includes(payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]) == false)
-                throw 'invalid use.'
+            if (accounts.$cache[uuid] == false)
+                throw 'invalid user.'
 
             return { payload: payload, error: null }
         } catch (err) {
