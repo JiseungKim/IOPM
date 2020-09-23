@@ -51,9 +51,9 @@ class Accounts {
                 user = Object.assign(parameters, { uuid: uuid4(), host: this.$next_host() })
                 connection.query(
                     `
-                INSERT INTO user(uuid, host, firebase_uid, email, nickname, photo, last_login, created_date)
-                VALUES('${user.uuid}', '${user.host}', '${f_uid}', '${user.email}', '${user.name}', '${user.photo}', UTC_TIMESTAMP(), UTC_TIMESTAMP())
-                `
+                    INSERT INTO user(uuid, host, firebase_uid, email, nickname, photo, last_login, created_date)
+                    VALUES('${user.uuid}', '${user.host}', '${f_uid}', '${user.email}', '${user.name}', '${user.photo}', UTC_TIMESTAMP(), UTC_TIMESTAMP())
+                    `
                 )
             }
             await connection.commit()
