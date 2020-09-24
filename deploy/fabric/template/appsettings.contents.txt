@@ -1,0 +1,21 @@
+{
+    "common": {
+        "port": 4000
+    },
+    "database": {
+        "host": "{{ database.server }}",
+        "user": "{{ database.uid }}",
+        "password": "{{ database.pwd }}",
+        "database": "{{ database.name }}",
+        "connectionLimit": {{ database.connectionLimit }}
+    },
+    "cdn": {
+        "protocol": "http",
+        "host": "{{ cdn.host }}",
+        "port": {{ cdn.port }}
+    },
+    "mail": {
+        "id": "inout.team.dev@gmail.com",
+        "pw": "admin!@34"
+    }
+}

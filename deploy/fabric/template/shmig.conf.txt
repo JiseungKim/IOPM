@@ -1,0 +1,5 @@
+TYPE="mysql"
+HOST="{{ database.server }}"
+DATABASE="{{ database.name }}"
+LOGIN="{{ database.uid }}"
+PASSWORD="{{ database.pwd }}"

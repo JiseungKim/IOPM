@@ -3,10 +3,10 @@ module.exports = {
         name: "auth",
         script: "./app.js",
         env: {
-            NODE_ENV: "local",
+            ENVIRONMENT: "local",
         },
         env_development: {
-            NODE_ENV: "development",
+            ENVIRONMENT: "development",
         }
     }]
 }

@@ -1,0 +1,74 @@
+{
+	"deploy": 
+	{
+		"auth": 
+		{
+			"auth-1":
+			{
+				"port": 3000,
+				"cdn": {
+					"host": "3.89.40.140",
+					"port": 3000
+				},
+				"database":
+				{
+					"server": "172.31.37.208",
+					"port": 3306,
+					"name": "io_auth",
+					"uid": "io",
+					"pwd": "admin",
+					"connectionLimit": 100
+				},
+
+				"redis":
+				{
+					"server": "172.31.37.208",
+					"port": 6379
+				},
+
+				"hosts": 
+				[
+					{
+						"public": "3.89.40.140",
+						"private": "172.31.37.208"
+					}
+				]
+			}
+		},
+
+		"contents": 
+		{
+			"contents-1":
+			{
+				"port": 4000,
+				"cdn": {
+					"host": "3.89.40.140",
+					"port": 3000
+				},
+				"database":
+				{
+					"server": "172.31.38.226",
+					"port": 3306,
+					"name": "io_contents",
+					"uid": "io",
+					"pwd": "admin",
+					"connectionLimit": 100
+				},
+
+				"redis":
+				{
+					"server": "172.31.38.226",
+					"port": 6379
+				},
+
+				"hosts": 
+				[
+					{
+						"public": "54.80.48.25",
+						"private": "172.31.38.226"
+					}
+				]
+			}
+		}
+	}
+}

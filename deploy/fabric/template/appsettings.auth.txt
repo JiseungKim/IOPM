@@ -1,0 +1,30 @@
+{
+    "common": {
+        "port": 3000
+    },
+    "database": {
+        "host": "{{ database.server }}",
+        "user": "{{ database.uid }}",
+        "password": "{{ database.pwd }}",
+        "database": "{{ database.name }}",
+        "connectionLimit": {{ database.connectionLimit }}
+    },
+    "cdn": {
+        "protocol": "http",
+        "host": "{{ cdn.host }}",
+        "port": {{ cdn.port }}
+    },
+    "secret_key": "joy",
+    "token_expire": {
+        "access_expire": "30m",
+        "refresh_expire": "7d"
+    },
+    "auth": {
+        "firebase": true
+    },
+    "mail": {
+        "id": "inout.team.dev@gmail.com",
+        "pw": "admin!@34"
+    },
+    "endpoints": {{ endpoints }}
+}

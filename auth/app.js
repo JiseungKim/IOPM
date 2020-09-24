@@ -37,7 +37,6 @@ app.use(createProxyMiddleware({
     target: "http://localhost:80",
     changeOrigin: true,
     router: async (req) => `http://${await accounts.endpoint(req.headers.uuid)}`,
-    router: (req) => 'http://localhost:4000',
     onProxyReq: (proxy_req, req, res) => {
 
         function write_body(proxy_req, data) {
