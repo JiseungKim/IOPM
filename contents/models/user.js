@@ -10,6 +10,23 @@ class User {
         this._pool = mysql.createPool(settings.database)
     }
 
+    async init(user) {
+        let connection = null
+        try {
+            connection = await this._pool.getConnection()
+            await connection.query(
+                `
+                INSERT INTO user (uuid, email, nickname, phone, photo, created_date) 
+                VALUES('${user.uuid}', '${user.email}', '${user.nickname}', '${user.phone}', '${user.photo}', UTC_TIMESTAMP())
+                `)
+        } catch (e) {
+            throw e
+        } finally {
+            if (connection != null)
+                connection.release()
+        }
+    }
+
     // firebase uid 검증
     async find_by_uuid(uuid) {
         let connection = null

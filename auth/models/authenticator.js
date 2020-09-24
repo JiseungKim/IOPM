@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken")
 const admin = require("firebase-admin")
 const uuid4 = require('uuid4')
 const accounts = require('../models/accounts')
+const request = require('request-promise-native')
 
 class Authenticator {
 
@@ -22,7 +23,19 @@ class Authenticator {
                 await admin.auth().verifyIdToken(data.token) :
                 { uid: uuid4() }
 
-            const { user } = await accounts.get(f_uid, data)
+            const { user, created } = await accounts.get(f_uid, data)
+            if (created) {
+                const response = await request({
+                    uri: `http://${await accounts.endpoint(user.uuid)}/api/user/init`,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(user)
+                })
+
+                console.log(response)
+            }
             const access_token = await this.issue(
                 user.uuid,
                 appsettings.token_expire.access_expire

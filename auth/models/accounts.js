@@ -59,13 +59,11 @@ class Accounts {
             }
             await connection.commit()
             await this.$host(user.uuid, user.host)
-            return { user: user, created: !empty }
+            return { user: user, created: empty }
         } catch (e) {
-            await connection?.rollback()
             if (connection != null)
                 await connection.rollback()
         } finally {
-            connection?.release()
             if (connection != null)
                 connection.release()
         }

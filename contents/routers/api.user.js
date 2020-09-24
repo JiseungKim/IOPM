@@ -11,6 +11,15 @@ const User = require('../models/user')
 
 const user = new User()
 
+router.post('/init', async_handler(async (req, res, next) => {
+    try {
+        res.json({ success: true, user: await user.init(req.body) })
+    } catch (e) {
+        console.error(e)
+        res.json({ success: false, error: e })
+    }
+}))
+
 router.get('/all', async_handler(async (req, res, next) => {
     try {
         const users = await user.find_all()
