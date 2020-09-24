@@ -1,0 +1,108 @@
+#contents
+{
+    text-align: center;
+}
+
+.config
+{
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px 10px;
+    margin: 0 auto;
+    width: 90%;
+    position: fixed;
+}
+
+.config > button {
+    margin-right: 5px;
+}
+
+.section-list {
+    display: block;
+    white-space: nowrap;
+    margin-top: 55px;
+}
+
+.section-list .section-item {
+    width: 20%;
+    display: inline-table;
+    margin: 0% 1%;
+    white-space: normal;
+}
+
+.section-list .section-item > .title {
+    font-weight: bold;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-list .section-item > .new-todo {
+    border: 1px #c0c0c0 solid;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.section-list .section-item > .new-todo > img
+{
+    margin: 5px;
+}
+
+.todo-list {
+    width: 100%;
+}
+
+.todo-list .todo-item {
+    display: inline-block;
+    border: 1px #c0c0c0 solid;
+    margin: 5px 0px;
+    padding: 15px 10px;
+    border-radius: 10px;
+    text-align: initial;
+    min-width: 240px;
+}
+
+.todo-list .todo-item .title
+{
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.todo-list .todo-item .responsibility
+{
+    display: flex;
+    margin-top: 15px;
+}
+
+.todo-list .todo-item .responsibility .thumb
+{
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    margin-right: 12px;
+}
+
+.todo-list .todo-item .responsibility .member-desc {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+}
+
+.todo-list .todo-item .responsibility .member-desc .name
+{
+    font-style: italic;
+}
+
+.todo-list .todo-item .responsibility .member-desc .desc
+{
+    font-size: 13px;
+    color: #c0c0c0;
+}
