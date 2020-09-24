@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.16, for Win64 (x86_64)
 --
--- Host: localhost    Database: io
+-- Host: localhost    Database: io_contents
 -- ------------------------------------------------------
 -- Server version	8.0.16
 
@@ -16,14 +16,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `io`
+-- Current Database: `io_contents`
 --
 
-/*!40000 DROP DATABASE IF EXISTS `io`*/;
+/*!40000 DROP DATABASE IF EXISTS `io_contents`*/;
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `io` /*!40100 DEFAULT CHARACTER SET euckr COLLATE euckr_bin */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `io_contents` /*!40100 DEFAULT CHARACTER SET euckr COLLATE euckr_bin */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
-USE `io`;
+USE `io_contents`;
 
 --
 -- Table structure for table `participation`
@@ -41,7 +41,7 @@ CREATE TABLE `participation` (
   KEY `fk_participation_project_idx` (`project_id`),
   CONSTRAINT `fk_participation_member` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_participation_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -60,7 +60,7 @@ CREATE TABLE `project` (
   PRIMARY KEY (`id`),
   KEY `owner_idx` (`owner`),
   CONSTRAINT `owner` FOREIGN KEY (`owner`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -78,7 +78,7 @@ CREATE TABLE `section` (
   PRIMARY KEY (`id`),
   KEY `fk_section_project_idx` (`project_id`),
   CONSTRAINT `fk_section_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -119,7 +119,7 @@ CREATE TABLE `todo` (
   KEY `fk_todo_member_idx` (`owner`),
   CONSTRAINT `fk_todo_member` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_todo_section` FOREIGN KEY (`section_id`) REFERENCES `section` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -132,19 +132,15 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uuid` varchar(100) CHARACTER SET euckr COLLATE euckr_bin NOT NULL,
-  `host` varchar(45) COLLATE euckr_bin NOT NULL,
-  `firebase_uid` varchar(100) CHARACTER SET euckr COLLATE euckr_bin NOT NULL,
   `email` varchar(100) CHARACTER SET euckr COLLATE euckr_bin DEFAULT NULL,
   `nickname` varchar(100) CHARACTER SET euckr COLLATE euckr_bin DEFAULT NULL,
   `phone` varchar(30) CHARACTER SET euckr COLLATE euckr_bin DEFAULT NULL,
   `photo` varchar(500) CHARACTER SET euckr COLLATE euckr_bin DEFAULT NULL,
-  `last_login` datetime NOT NULL,
   `created_date` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid_UNIQUE` (`uuid`),
-  UNIQUE KEY `firebase_uid_UNIQUE` (`firebase_uid`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -156,4 +152,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-23 21:44:26
+-- Dump completed on 2020-09-25  2:18:08
