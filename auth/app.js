@@ -41,6 +41,8 @@ app.use(createProxyMiddleware({
     onProxyReq: (proxy_req, req, res) => {
 
         function write_body(proxy_req, data) {
+            if (data == null)
+                return
             proxy_req.setHeader('Content-Length', Buffer.byteLength(data))
             proxy_req.write(data)
         }
@@ -51,7 +53,7 @@ app.use(createProxyMiddleware({
             return
 
         if (proxy_req.getHeader('Content-Type') === 'application/json')
-            write_body(JSON.stringify(req.body))
+            write_body(proxy_req, JSON.stringify(req.body))
     },
     onProxyRes: (proxy_res, req, res) => {
         proxy_res.headers.uuid = req.headers.uuid
