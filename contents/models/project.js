@@ -20,7 +20,8 @@ class Project {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -35,7 +36,8 @@ class Project {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -61,7 +63,8 @@ class Project {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -100,7 +103,8 @@ class Project {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -117,7 +121,8 @@ class Project {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -154,7 +159,8 @@ class Project {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -195,7 +201,8 @@ class Project {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 }

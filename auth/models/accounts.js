@@ -34,7 +34,8 @@ class Accounts {
         } catch (e) {
 
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -61,8 +62,12 @@ class Accounts {
             return { user: user, created: !empty }
         } catch (e) {
             await connection?.rollback()
+            if (connection != null)
+                await connection.rollback()
         } finally {
             connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 

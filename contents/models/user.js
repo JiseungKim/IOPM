@@ -27,7 +27,8 @@ class User {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
     // firebase uid 검증
@@ -47,7 +48,8 @@ class User {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -68,7 +70,8 @@ class User {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -86,7 +89,8 @@ class User {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -102,7 +106,8 @@ class User {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -122,7 +127,8 @@ class User {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -138,7 +144,8 @@ class User {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -178,7 +185,8 @@ class User {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -205,7 +213,8 @@ class User {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -223,7 +232,8 @@ class User {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 }

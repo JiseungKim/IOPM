@@ -24,7 +24,8 @@ class Todo {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -40,7 +41,8 @@ class Todo {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -110,7 +112,8 @@ class Todo {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -148,7 +151,8 @@ class Todo {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -169,7 +173,8 @@ class Todo {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -194,7 +199,8 @@ class Todo {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 }

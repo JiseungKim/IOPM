@@ -19,7 +19,8 @@ class Participation {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -42,7 +43,8 @@ class Participation {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
@@ -60,7 +62,8 @@ class Participation {
         } catch (err) {
             throw err
         } finally {
-            connection?.release()
+            if (connection != null)
+                connection.release()
         }
     }
 
