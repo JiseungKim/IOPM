@@ -42,19 +42,19 @@ def migration_contents():
 
 @task
 def provide(auth, contents):
-    if auth:
+    if auth.lower() == 'true':
         execute(provide_auth)
 
-    if contents:
+    if contents.lower() == 'true':
         execute(provide_contents)
 
 @task
 def deploy(auth, contents):
-    if auth == 'True':
+    if auth.lower() == 'true':
         execute(migration_auth)
         execute(deploy_auth)
 
-    if contents == 'True':
+    if contents.lower() == 'true':
         execute(migration_contents)
         execute(deploy_contents)
 
@@ -99,9 +99,11 @@ def deploy_auth():
 
         # update environment file
         context = current_config(env.host)
-        endpoints = []
+        endpoints = {}
         for name in CONFIGURATION['deploy']['contents']:
-            endpoints = endpoints + list(map(lambda x: f"{x['private']}:{current_config(x['private'])['port']}", CONFIGURATION['deploy']['contents'][name]['hosts']))
+            if name not in endpoints:
+                endpoints[name] = []
+            endpoints[name] = endpoints[name] + list(map(lambda x: f"{x['private']}:{current_config(x['private'])['port']}", CONFIGURATION['deploy']['contents'][name]['hosts']))
         context['endpoints'] = json.dumps(endpoints)
 
         files.upload_template(filename='appsettings.auth.txt',
@@ -214,9 +216,9 @@ def provide_common():
     sudo('apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8')
     sudo('add-apt-repository "deb [arch=amd64,arm64,ppc64el] http://mariadb.mirror.liquidtelecom.com/repo/10.4/ubuntu $(lsb_release -cs) main"')
     sudo('DEBIAN_FRONTEND=noninteractive apt-get install mariadb-server mariadb-client -y')
-    sudo(f"mysql -se 'DROP USER IF EXISTS'")
-    sudo(f"mysql -se 'CREATE USER \'{DATABASE_CONFIG['id']}\'@\'%\' IDENTIFIED BY \'{DATABASE_CONFIG['pw']}\''")
-    sudo(f"mysql -se 'GRANT ALL PRIVILEGES ON *.* TO \'{DATABASE_CONFIG['id']}\'@\'%\''")
+    sudo(f"mysql -se 'DROP USER IF EXISTS \"{DATABASE_CONFIG['id']}\"@\"%\"'")
+    sudo(f"mysql -se 'CREATE USER \"{DATABASE_CONFIG['id']}\"@\"%\" IDENTIFIED BY \"{DATABASE_CONFIG['pw']}\"'")
+    sudo(f"mysql -se 'GRANT ALL PRIVILEGES ON *.* TO \"{DATABASE_CONFIG['id']}\"@\"%\"'")
     sudo(f"mysql -se 'FLUSH PRIVILEGES'")
     sudo('systemctl stop mysql')
     put(f'environment/my.cnf', '/etc/mysql/my.cnf', use_sudo=True)

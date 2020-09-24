@@ -9,6 +9,10 @@
         "database": "{{ database.name }}",
         "connectionLimit": {{ database.connectionLimit }}
     },
+    "redis": {
+        "host": "{{ redis.server }}",
+        "port": {{ redis.port}}
+    },
     "cdn": {
         "protocol": "http",
         "host": "{{ cdn.host }}",

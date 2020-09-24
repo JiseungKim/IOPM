@@ -55,17 +55,44 @@
 					"connectionLimit": 100
 				},
 
-				"redis":
-				{
-					"server": "172.31.38.226",
-					"port": 6379
-				},
-
 				"hosts": 
 				[
 					{
 						"public": "54.80.48.25",
 						"private": "172.31.38.226"
+					},
+					{
+						"public": "35.153.158.120",
+						"private": "172.31.32.170"
+					}
+				]
+			},
+			"contents-2":
+			{
+				"port": 4000,
+				"cdn": {
+					"host": "3.89.40.140",
+					"port": 3000
+				},
+				"database":
+				{
+					"server": "172.31.38.226",
+					"port": 3306,
+					"name": "io_contents",
+					"uid": "io",
+					"pwd": "admin",
+					"connectionLimit": 100
+				},
+
+				"hosts": 
+				[
+					{
+						"public": "54.172.232.50",
+						"private": "172.31.45.110"
+					},
+					{
+						"public": "18.232.134.75",
+						"private": "172.31.47.165"
 					}
 				]
 			}
