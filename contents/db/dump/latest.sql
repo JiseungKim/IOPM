@@ -41,7 +41,7 @@ CREATE TABLE `participation` (
   KEY `fk_participation_project_idx` (`project_id`),
   CONSTRAINT `fk_participation_member` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_participation_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -60,7 +60,7 @@ CREATE TABLE `project` (
   PRIMARY KEY (`id`),
   KEY `owner_idx` (`owner`),
   CONSTRAINT `owner` FOREIGN KEY (`owner`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -140,7 +140,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uuid_UNIQUE` (`uuid`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=euckr COLLATE=euckr_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -152,4 +152,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-25  2:18:08
+-- Dump completed on 2020-09-26 20:21:35

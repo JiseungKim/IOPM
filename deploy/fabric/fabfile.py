@@ -103,7 +103,8 @@ def deploy_auth():
         for name in CONFIGURATION['deploy']['contents']:
             if name not in endpoints:
                 endpoints[name] = []
-            endpoints[name] = endpoints[name] + list(map(lambda x: f"{x['private']}:{current_config(x['private'])['port']}", CONFIGURATION['deploy']['contents'][name]['hosts']))
+            
+            endpoints[name] = endpoints[name] + list(map(lambda x: f"{x['private']}:{CONFIGURATION['deploy']['contents'][name]['port']}", CONFIGURATION['deploy']['contents'][name]['hosts']))
         context['endpoints'] = json.dumps(endpoints)
 
         files.upload_template(filename='appsettings.auth.txt',
