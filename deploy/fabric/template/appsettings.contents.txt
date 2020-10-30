@@ -1,6 +1,6 @@
 {
     "common": {
-        "port": 4000
+        "port": {{ port }}
     },
     "database": {
         "host": "{{ database.server }}",
