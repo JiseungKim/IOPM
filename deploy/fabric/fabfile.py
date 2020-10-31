@@ -18,6 +18,7 @@ ENDPOINTS = []
 
 @task
 def deploy():
+    execute(clear_docker)
     execute(auth)
     execute(contents)
 
@@ -37,6 +38,9 @@ def environment(e):
                 for public_ip in [x['public'] for x in config['hosts']]:
                     if public_ip not in env['roledefs'][role]['hosts']:
                         env['roledefs'][role]['hosts'].append(public_ip)
+
+                    if public_ip not in env['hosts']:
+                        env['hosts'].append(public_ip)
 
 
         for name, config in deploy['contents'].items():
@@ -107,15 +111,17 @@ def current():
     
     return {x: config[x] for x in config if host in list(map(lambda x: x['public'], config[x]['hosts']))}
 
+def clear_docker():
+    prefix = 'iopm'
+    with settings(warn_only=True):
+        sudo(f'docker ps --filter name={prefix}* -aq | xargs docker stop | xargs docker rm')
+        sudo(f'docker images --filter=reference={prefix}:* -aq | xargs docker rmi')
+
 def reset_docker(role, port):
     global ENVIRONMENT
 
     image_name = f'iopm:{role}.{port}'
     container_name = f'iopm-{role}-{port}'
-    with settings(warn_only=True):
-        sudo(f'docker stop {container_name}')
-        sudo(f'docker rm {container_name}')
-        sudo(f'docker rmi {image_name}')
 
     sudo(f'docker build --tag {image_name} ./{port}')
     sudo(f'docker run -it -d --name {container_name} -e ENVIRONMENT={ENVIRONMENT} -p {port}:{port} {image_name}')
