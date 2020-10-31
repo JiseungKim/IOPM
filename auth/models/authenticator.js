@@ -7,9 +7,9 @@ const request = require('request-promise-native')
 
 class Authenticator {
 
-    async issue(uuid, time) {
+    async issue(id, time) {
 
-        const result = await this.jwt(uuid, time)
+        const result = await this.jwt(id, time)
 
         if (result.error)
             throw result.error
@@ -25,27 +25,32 @@ class Authenticator {
 
             const { user, created } = await accounts.get(f_uid, data)
             if (created) {
-                const response = await request({
-                    uri: `http://${await accounts.endpoint(user.uuid)}/api/user/init`,
+                await request({
+                    uri: `http://${await accounts.endpoint(user.id)}/api/user/init`,
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(user)
                 })
-
-                console.log(response)
             }
             const access_token = await this.issue(
-                user.uuid,
+                user.id,
                 appsettings.token_expire.access_expire
             )
             const refresh_token = await this.issue(
-                user.uuid,
+                user.id,
                 appsettings.token_expire.refresh_expire
             )
 
-            return { user: user, access_token: access_token, refresh_token: refresh_token, error: null }
+            return {
+                user: user,
+                token: {
+                    access: access_token,
+                    refresh: refresh_token
+                },
+                error: null
+            }
         } catch (error) {
             return { user: null, token: null, error: error }
         }
@@ -56,12 +61,12 @@ class Authenticator {
         try {
             payload = await jwt.verify(token, appsettings.secret_key)
 
-            const uuid = payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]
+            const id = payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]
 
-            if (uuid == null)
-                throw 'invalid name.'
+            if (id == null)
+                throw 'invalid id.'
 
-            if (accounts.host(uuid) == null)
+            if (accounts.host(id) == null)
                 throw 'invalid user.'
 
             return { payload: payload, error: null }
@@ -82,8 +87,8 @@ class Authenticator {
                 throw "올바르지 않은 token입니다."
         }
 
-        const uuid = refresh_payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]
-        if (uuid == null)
+        const id = refresh_payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"]
+        if (id == null)
             throw 'invalid uuid.'
 
         // access token 만료 검증
@@ -92,19 +97,19 @@ class Authenticator {
         if (access_err) {
             if (access_err.name == "TokenExpiredError") {
                 // 재발행
-                access = this.issue(uuid, appsettings.token_expire.access_expire)
-                refresh = this.issue(uuid, appsettings.token_expire.refresh_expire)
+                access = this.issue(id, appsettings.token_expire.access_expire)
+                refresh = this.issue(id, appsettings.token_expire.refresh_expire)
             } else {
                 throw "올바르지 않은 token 입니다."
             }
         }
 
-        return { access: access, refresh: refresh, uuid: uuid }
+        return { access: access, refresh: refresh, id: id }
     }
 
-    async jwt(uuid, ttl) {
+    async jwt(id, ttl) {
         const claims = {
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": uuid,
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": id,
             "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "User"
         }
 

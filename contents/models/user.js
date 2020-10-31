@@ -1,168 +1,69 @@
-const mysql = require("mysql2/promise")
-const settings = require("../modules/config")
+const context = require('./context')
+const { Op } = require('sequelize')
+const { sequelize } = require('./context')
 
 const sha256 = require("../modules/SHA256")
 // 팀이름 공백, 영문, 한글, 숫자, _ , -만 가능하게 검사하기
 // SQL injection!
 
 class User {
-    constructor() {
-        this._pool = mysql.createPool(settings.database)
-    }
 
     async init(user) {
-        let connection = null
+        const t = await sequelize.transaction()
         try {
-            connection = await this._pool.getConnection()
-            await connection.query(
-                `
-                INSERT INTO user (uuid, email, nickname, phone, photo, created_date) 
-                VALUES('${user.uuid}', '${user.email}', '${user.nickname}', '${user.phone}', '${user.photo}', UTC_TIMESTAMP())
-                `)
+            const created = await context.users.create({
+                id: user.id,
+                uuid: user.uuid,
+                email: user.email,
+                nickname: user.nickname,
+                phone: user.phone,
+                photo: user.photo
+            }, { transaction: t })
+
+            t.commit()
+            return created
         } catch (e) {
-            throw e
-        } finally {
-            if (connection != null)
-                connection.release()
+            console.error(e)
+            t.rollback()
+            return null
         }
     }
 
+    // firebase uid 검증
+    async find(id) {
+        try {
+            return await context.users.findOne({ where: { id: id } })
+        } catch (e) {
+            console.error(e)
+            return null
+        }
+    }
     // firebase uid 검증
     async find_by_uuid(uuid) {
-        let connection = null
-
         try {
-            connection = await this._pool.getConnection()
-
-            const [users] = await connection.query(
-                `SELECT * FROM user WHERE uuid='${uuid}'`
-            )
-
-            if (users.length == 0) return null
-
-            return users[0]
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
-        }
-    }
-    // firebase uid 검증
-    async find_by_firebase_uid(firebase_uid) {
-        let connection = null
-
-        try {
-            connection = await this._pool.getConnection()
-
-            const [users] = await connection.query(
-                `SELECT * FROM user WHERE firebase_uid='${firebase_uid}'`
-            )
-
-            if (users.length == 0) return null
-
-            return users[0]
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            return await context.users.findOne({ where: { uuid: uuid } })
+        } catch (e) {
+            console.error(e)
+            return null
         }
     }
 
-    // uuid 검증
-    async uuid_exists(uuid) {
-        let connection = null
-
+    // id 검증
+    async exists(id) {
         try {
-            connection = await this._pool.getConnection()
-
-            const [user] = await connection.query(
-                `SELECT COUNT(*) AS count FROM user WHERE uuid='${uuid}'`
-            )
-
-            if (user[0].count == 0) return false
-
-            return true
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            return this.find(id) != null
+        } catch (e) {
+            console.error(e)
+            return false
         }
     }
 
-    async create_uuid(user) {
-        let connection = null
-
+    async all() {
         try {
-            connection = await this._pool.getConnection()
-
-            const [result] = await connection.query(
-                `INSERT INTO user(uuid, firebase_uid, last_login, created_date)
-                VALUES('${user.uuid}', '${user.firebase_uid}', UTC_TIMESTAMP(), UTC_TIMESTAMP())`
-            )
-            return result.insertId
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
-        }
-    }
-
-    async update_last_login(mid) {
-        let connection = null
-
-        try {
-            connection = await this._pool.getConnection()
-
-            await connection.query(
-                `UPDATE user SET last_login=now() WHERE id=${mid}`
-            )
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
-        }
-    }
-
-    async find(mid) {
-        let connection = null
-
-        try {
-            connection = await this._pool.getConnection()
-
-            const [rows] = await connection.query(
-                `SELECT * FROM user WHERE id=${mid}`
-            )
-
-            if (rows.length == 0) return null
-
-            return rows[0]
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
-        }
-    }
-
-    async find_all() {
-        let connection = null
-
-        try {
-            connection = await this._pool.getConnection()
-
-            const [rows] = await connection.query(`SELECT * FROM user`)
-
-            return rows
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            return await context.users.findAll()
+        } catch (e) {
+            console.error(e)
+            return []
         }
     }
 
@@ -177,80 +78,50 @@ class User {
         }
     }
 
-    async add(user) {
-        let connection = null
+    async update(user) {
         const code = sha256(user.password)
+        const t = await sequelize.transaction()
 
         try {
-            connection = await this._pool.getConnection()
+            const found = await context.users.findOne({
+                where: {
+                    [Op.or]: [
+                        { email: user.email },
+                        { nickname: user.nickname }]
+                }
+            })
 
-            const [rows] = await connection.query(
-                `SELECT * FROM user
-                WHERE email='${user.email}' OR nickname='${user.nickname}'`
-            )
+            if (found != null) {
+                if (found.email == user.email)
+                    throw "중복된 이메일입니다."
 
-            for (let row of rows) {
-                if (row.email == user.email) throw "중복된 이메일입니다."
-                if (row.nickname == user.nickname) throw "중복된 닉네임입니다."
+                if (found.nickname == user.nickname)
+                    throw "중복된 닉네임입니다."
             }
 
-            const [result] = await connection.query(
-                `INSERT INTO user(email,password,nickname,phone,photo,last_login,created_date)
-                VALUES('${user.email}','${code}','${user.nickname}','${user.phone}','${user.photo}',UTC_TIMESTAMP(),UTC_TIMESTAMP())`
-            )
-            return result.insertId
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            await context.users.update({
+                password: code,
+                email: user.email,
+                nickname: user.nickname,
+                phone: user.phone,
+                photo: user.photo
+            }, { transaction: t })
+
+            t.commit()
+            return user.id
+        } catch (e) {
+            console.error(e)
+            t.rollback()
+            throw e
         }
     }
 
-    async update(user_id, user) {
-        let connection = null
-
+    async remove(id) {
         try {
-            connection = await this._pool.getConnection()
-
-            const [exists] = await connection.query(
-                `SELECT COUNT(*) AS count FROM user
-                WHERE NOT id='${user_id}' AND nickname='${user.nickname}'`
-            )
-
-            if (exists[0].count > 0) return null
-
-            const [result] = await connection.query(
-                `UPDATE user SET
-                nickname='${user.nickname}',photo='${user.photo}',phone='${user.phone}'
-                WHERE id=${user_id}`
-            )
-
-            return result.affectedRows > 0
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
-        }
-    }
-
-    async remove(mid) {
-        let connection = null
-
-        try {
-            connection = await this._pool.getConnection()
-
-            const [result] = await connection.query(
-                `DELETE FROM user WHERE id=${mid}`
-            )
-
-            return result.affectedRows > 0
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            await user.destroy({ where: { id: id } })
+        } catch (e) {
+            console.error(e)
+            throw e
         }
     }
 }

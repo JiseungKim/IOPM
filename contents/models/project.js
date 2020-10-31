@@ -1,208 +1,131 @@
 
-const mysql = require('mysql2/promise')
-const settings = require('../modules/config')
+const context = require('./context')
+const { Op } = require('sequelize')
+const { sequelize } = require('./context')
 
 // TODO: 정규식
 
 class Project {
-    constructor() {
-        this._pool = mysql.createPool(settings.database)
-    }
-
-    async find_by_id(pid) {
-        let connection = null
-
+    async find(id) {
         try {
-            connection = await this._pool.getConnection()
-
-            const [[row]] = await connection.query(`SELECT * FROM project WHERE id=${pid}`)
-            return row
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            return await context.projects.findOne({ where: { id: id } })
+        } catch (e) {
+            console.error(e)
+            throw e
         }
     }
 
-    async find_by_owner(user_id) {
-        let connection = null
-
+    async find_by_owner(user) {
         try {
-            connection = await this._pool.getConnection()
-
-            const [[row]] = await connection.query(`SELECT * FROM project WHERE owner='${user_id}'`)
-            return row
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            return await context.projects.findAll({ where: { owner: user.id } })
+        } catch (e) {
+            console.error(e)
+            throw e
         }
     }
 
-    async find_by_user(user_id) {
-        let connection = null
-
+    async find_by_user(uid) {
         try {
-            connection = await this._pool.getConnection()
+            const user = await context.users.findOne({ where: { id: uid }, include: [{ model: context.projects }] })
+            if (user == null)
+                return []
 
-            const [rows] = await connection.query(
-                `
-                SELECT 
-                    project.id, project.name, project.desc, 
-                    project.owner=user.id AS mine
-                FROM project
-                    LEFT JOIN user ON user.uuid='${user_id}'
-                    LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
-                WHERE participation.id IS NOT NULL;
-                `
-            )
-
-            return rows
+            return user.projects
         } catch (err) {
+            console.error(err)
             throw err
-        } finally {
-            if (connection != null)
-                connection.release()
         }
     }
 
-    async add(name, desc, user_id) {
-        let connection = null
-        try {
-            connection = await this._pool.getConnection()
+    async add(name, desc, uid) {
 
+        const t = await sequelize.transaction()
+        try {
             // TODO: 프로젝트 이름 정규식
             // 자신이 만든 프로젝트에 중복된 팀 이름이 있는지 검사
-            const [[exists]] = await connection.query(
-                `SELECT COUNT(*) AS count FROM project
-                WHERE name='${name}' AND owner='${user_id}'`
-            )
 
-            if (exists.count > 0)
-                return null
+            const user = await context.users.findOne({
+                where: { id: uid },
+                include: [{ model: context.projects }]
+            })
 
-            const [[user]] = await connection.query(
-                `SELECT id FROM user WHERE uuid='${user_id}' LIMIT 1`
-            )
+            if (user == null)
+                throw '계정이 없습니다.'
 
-            const [result] = await connection.query(
-                `INSERT INTO project(name, \`desc\`, owner, created_date) VALUES('${name}', '${desc}', ${user.id}, UTC_TIMESTAMP())`
-            )
-
-            await connection.query(
-                `INSERT INTO participation(project_id, user_id) VALUES(${result.insertId}, ${user.id})`
-            )
-
-            return {
-                id: result.insertId,
-                name: name,
-                desc: desc
+            for (const project of user.projects) {
+                if (project.name == name)
+                    throw "프로젝트 이름이 중복됩니다"
             }
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+
+            const project = await context.projects.create({
+                name: name,
+                desc: desc,
+                owner: uid
+            }, { transaction: t })
+
+            await project.addUsers(user, { transaction: t })
+            await t.commit()
+            return project
+        } catch (e) {
+            console.error(e)
+            t.rollback()
+            throw e
         }
     }
 
-    async update(project, user_id, project_id) {
-        let connection = null
+    async update(project, uid, pid) {
+        const t = sequelize.transaction()
         try {
-            connection = await this._pool.getConnection()
+            const found = await context.projects.findOne({ where: { [Op.and]: [{ id: pid }, { owner: uid }] } }, { transaction: t })
+            if (found == null)
+                throw '권한이 없습니다.'
 
-            const [result] = await this._pool.query(
-                `UPDATE project SET name=${project.name} WHERE id=${project_id} AND owner='${user_id}'`
-            )
-
-            return result.affectedRows > 0
+            await context.projects.update({ name: project.name }, { where: { id: pid } }, { transaction: t })
+            await t.commit()
         } catch (err) {
+            t.rollback()
             throw err
-        } finally {
-            if (connection != null)
-                connection.release()
         }
     }
 
-    async remove(project_id, user_id) {
-        let connection = null
-
+    async remove(pid, uid) {
+        const t = await sequelize.transaction()
         try {
-            connection = await this._pool.getConnection()
+            const found = await context.projects.findOne({ where: { [Op.and]: { id: pid, owner: uid } } }, { transaction: t })
+            if (found == null)
+                throw '권한이 없습니다.'
 
-            let [[result]] = await connection.query(
-                `
-                SELECT 
-                    user.id AS uid, 
-                    project.id AS pid,
-                    user.id=project.owner AS mine 
-                FROM project
-                    LEFT JOIN participation ON participation.project_id=project.id
-                    LEFT JOIN user ON user.id=participation.user_id AND user.uuid='${user_id}'
-                WHERE 
-                    project.id=${project_id} AND
-                    user.id IS NOT NULL;
-                `
-            )
-
-            if (result == null)
-                throw 'Not participated.'
-
-            if (result.mine)
-                [result] = await connection.query(`DELETE FROM project WHERE id=${result.pid}`)
-            else
-                [result] = await connection.query(`DELETE FROM participation WHERE project_id=${result.pid} AND user_id=${result.uid}`)
-
-            return result.affectedRows > 0
+            await context.projects.destroy({ where: { id: pid } }, { transaction: t })
+            await t.commit()
         } catch (err) {
+            t.rollback()
             throw err
-        } finally {
-            if (connection != null)
-                connection.release()
         }
     }
 
-    async invite(name, user_id, email) {
-        let connection = null
+    async invite(name, uid, email) {
 
+        const t = await sequelize.transaction()
         try {
-            connection = await this._pool.getConnection()
-            const [[project]] = await connection.query(
-                `
-                SELECT project.id AS id FROM project
-                    LEFT JOIN user ON user.uuid='${user_id}'
-                    LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
-                WHERE
-                    project.name='${name}' AND project.owner=user.id
-                `
-            )
-
+            const project = await context.projects.findOne({ where: { name: name, owner: uid } }, { transaction: t })
             if (project == null)
-                throw `Cannot invite user '${email}'. You don't have any priviliges.`
+                throw '프로젝트가 없습니다.'
 
-            const [[candidate]] = await connection.query(
-                `
-                SELECT user.id FROM user
-                    LEFT JOIN participation ON participation.project_id=${project.id} AND participation.user_id=user.id
-                WHERE 
-                    user.email='${email}' AND
-                    participation.id IS NULL
-                `
-            )
+            const to = await context.users.findOne({ where: { email: email }, include: [{ model: context.projects }] }, { transaction: t })
+            if (to == null)
+                throw '상대가 없습니다.'
 
-            if (candidate == null)
-                throw `Cannot invite user. '${email}' is not valid or already participated.`
+            for (const x of to.projects) {
+                if (x.id == project.id)
+                    throw '이미 참여중인 유저입니다.'
+            }
 
-            const [result] = await connection.query(`INSERT INTO participation(project_id, user_id) VALUES(${project.id}, ${candidate.id})`)
-
-            return result.affectedRows > 0
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            await project.addUser(to, { transaction: t })
+            await t.commit()
+        } catch (e) {
+            t.rollback()
+            console.error(e)
+            throw e
         }
     }
 }

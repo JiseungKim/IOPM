@@ -31,7 +31,6 @@ new Vue({
             if (response.data.success == false)
                 throw response.data.error
 
-            console.log(response.data)
             this.sections = response.data.sections
             this.mine = response.data.mine
         } catch (e) {
@@ -57,7 +56,7 @@ new Vue({
 
         $update_created_section: function (id, name) {
             // 바로 업데이트가 안됨 이유를 모르겠음
-            this.sections.push({ id: id, name: name, todo_list: [] })
+            this.sections.push({ id: id, name: name, todos: [] })
         },
 
         $request_create_todo: async function (title, desc, section) {
@@ -77,20 +76,19 @@ new Vue({
                 )
         },
 
-        $update_created_todo: function (id, title, desc, section_id) {
+        $update_created_todo: function (todo, section_id) {
 
-            console.log(this.sections.find)
             const found = this.sections.find(x => x.id == section_id)
             if (found == null)
                 throw 'unknown exception'
 
-            found.todo_list.push({
-                id: id,
-                title: title,
-                description: desc,
+            found.todos.push({
+                id: todo.id,
+                title: todo.title,
+                owner: todo.owner,
+                description: todo.description,
                 mine: true
             })
-            console.log(found.todo_list)
         },
 
         $request_remove_todo: async function (id) {
@@ -108,11 +106,11 @@ new Vue({
 
         $update_remove_todo: function (id) {
             for (let section of this.sections) {
-                const found = section.todo_list.findIndex(x => x.tid == id)
+                const found = section.todos.findIndex(x => x.id == id)
                 if (found == -1)
                     continue
 
-                section.todo_list.splice(found, 1)
+                section.todos.splice(found, 1)
                 return true
             }
             return false
@@ -214,8 +212,8 @@ new Vue({
                             throw response.body.error
 
                         const todo = response.body.todo
-                        console.log(todo)
-                        handle_update(todo.id, todo.title, todo.desc, section_id)
+                        console.log(response.body.todo)
+                        handle_update(todo, section_id)
                     } catch (e) {
                         swal.showValidationMessage(`Request failed : ${e}`)
                     }

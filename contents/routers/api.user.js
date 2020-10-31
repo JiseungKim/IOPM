@@ -22,7 +22,7 @@ router.post('/init', async_handler(async (req, res, next) => {
 
 router.get('/all', async_handler(async (req, res, next) => {
     try {
-        const users = await user.find_all()
+        const users = await user.all()
         res.json({ success: true, users: users })
     } catch (err) {
         console.log(err)
@@ -46,7 +46,7 @@ router.get('/find_by_id/:uid', async_handler(async (req, res, next) => {
 
 router.post('/signup', async_handler(async (req, res, next) => {
     try {
-        const id = await user.add(req.body)
+        const id = await user.update(req.body)
 
         res.json({ success: true, id: id })
     } catch (err) {

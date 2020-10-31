@@ -36,7 +36,7 @@ router.get('/find_by_owner/:uid', async_handler(async (req, res, next) => {
 // 가입한 프로젝트 검색
 router.get('/get', async_handler(async (req, res, next) => {
     try {
-        const found = await project.find_by_user(req.headers.uuid)
+        const found = await project.find_by_user(req.headers.id)
         res.json({ success: true, projects: found })
     } catch (err) {
         console.error(err)
@@ -48,7 +48,7 @@ router.get('/get', async_handler(async (req, res, next) => {
 router.post('/make', async_handler(async (req, res, next) => {
     // TODO: 팀의 관리자만 생성 가능
     try {
-        const data = await project.add(req.body.title, req.body.desc, req.headers.uuid)
+        const data = await project.add(req.body.title, req.body.desc, req.headers.id)
 
         if (data == null)
             throw "프로젝트 이름이 중복됩니다"
@@ -62,7 +62,7 @@ router.post('/make', async_handler(async (req, res, next) => {
 
 router.post('/update/:pid', async_handler(async (req, res, next) => {
     try {
-        const success = await project.update(req.body.project, req.headers.uuid, req.params.pid)
+        const success = await project.update(req.body.project, req.headers.id, req.params.pid)
 
         if (success == null)
             throw "프로젝트 이름이 중복됩니다"
@@ -76,7 +76,7 @@ router.post('/update/:pid', async_handler(async (req, res, next) => {
 
 router.post('/remove/:pid', async_handler(async (req, res, next) => {
     try {
-        const success = await project.remove(req.params.pid, req.headers.uuid)
+        const success = await project.remove(req.params.pid, req.headers.id)
 
         if (success == null)
             throw "관리자가 아닙니다."
@@ -90,7 +90,7 @@ router.post('/remove/:pid', async_handler(async (req, res, next) => {
 
 router.post('/invite', async_handler(async (req, res, next) => {
     try {
-        await project.invite(req.body.name, req.headers.uuid, req.body.email)
+        await project.invite(req.body.name, req.headers.id, req.body.email)
 
         mail.send(req.body.email, 'title...', 'good')
         res.json({ success: true })

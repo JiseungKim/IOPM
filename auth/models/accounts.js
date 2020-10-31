@@ -1,11 +1,9 @@
-const appsettings = require("../modules/config");
-const mysql = require("mysql2/promise")
-const uuid4 = require('uuid4')
+const appsettings = require("../modules/config")
 const redis = require('redis')
+const { users, sequelize } = require('./context')
 
 class Accounts {
     constructor() {
-        this.$pool = mysql.createPool(appsettings.database)
         this.$redis = redis.createClient(appsettings.redis)
         this.$round_robin_index = 0
 
@@ -25,59 +23,51 @@ class Accounts {
     }
 
     async $init() {
-        let connection = null
         try {
-            connection = await this.$pool.getConnection()
-            const [rows] = await connection.query('SELECT uuid, host FROM user')
+            const rows = await users.findAll()
             for (let row of rows)
                 this.$host(row.uuid, row.host)
         } catch (e) {
-
-        } finally {
-            if (connection != null)
-                connection.release()
+            console.error(e)
         }
     }
 
-    async get(f_uid, parameters) {
+    async get(uuid, parameters) {
         parameters = parameters || {}
 
-        let connection = null
+        const t = await sequelize.transaction()
         try {
-            connection = await this.$pool.getConnection()
-            connection.beginTransaction()
-            let [[user]] = await connection.query(`SELECT * FROM user WHERE firebase_uid = '${f_uid}'`)
+
+            let user = await users.findOne({ where: { uuid: uuid } })
             const empty = (user == null)
             if (empty) {
-                user = Object.assign(parameters, { uuid: uuid4(), host: this.$next_host() })
-                connection.query(
-                    `
-                    INSERT INTO user(uuid, host, firebase_uid, email, nickname, photo, last_login, created_date)
-                    VALUES('${user.uuid}', '${user.host}', '${f_uid}', '${user.email}', '${user.name}', '${user.photo}', UTC_TIMESTAMP(), UTC_TIMESTAMP())
-                    `
-                )
+                user = await users.create({
+                    uuid: uuid,
+                    host: this.$next_host(),
+                    email: parameters.email,
+                    nickname: parameters.name,
+                    photo: parameters.photo
+                }, { transaction: t })
             }
-            await connection.commit()
-            await this.$host(user.uuid, user.host)
+            await t.commit()
+            await this.$host(user.id, user.host)
             return { user: user, created: empty }
         } catch (e) {
-            if (connection != null)
-                await connection.rollback()
-        } finally {
-            if (connection != null)
-                connection.release()
+            console.error(e)
+            t.rollback()
+            return { user: null, created: false }
         }
     }
 
-    async endpoint(uuid) {
-        const endpoints = appsettings.endpoints[await this.host(uuid)]
+    async endpoint(id) {
+        const endpoints = appsettings.endpoints[await this.host(id)]
         return endpoints[Math.floor(Math.random() * endpoints.length)]
     }
 
-    async $host(uuid, host) {
+    async $host(id, host) {
         return new Promise((resolve, reject) => {
             try {
-                this.$redis.set(this.$redis_key.host(uuid), host, () => {
+                this.$redis.set(this.$redis_key.host(id), host, () => {
                     resolve(true)
                 })
             } catch (e) {
@@ -86,10 +76,10 @@ class Accounts {
         })
     }
 
-    async host(uuid) {
+    async host(id) {
         return new Promise((resolve, reject) => {
             try {
-                this.$redis.get(this.$redis_key.host(uuid), (error, value) => {
+                this.$redis.get(this.$redis_key.host(id), (error, value) => {
                     if (error)
                         reject(error)
                     else

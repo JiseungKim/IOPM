@@ -14,7 +14,7 @@ REMOTE_ROOT = '/var/io'
 
 CONFIGURATION = {}
 ENVIRONMENT = None
-ENDPOINTS = []
+ENDPOINTS = {}
 
 @task
 def deploy():
@@ -44,9 +44,11 @@ def environment(e):
 
 
         for name, config in deploy['contents'].items():
+            if name not in ENDPOINTS:
+                ENDPOINTS[name] = []
             for endpoint in [f"{x['private']}:{x['port']}" for x in config['hosts']]:
-                if endpoint not in ENDPOINTS:
-                    ENDPOINTS.append(endpoint)
+                if endpoint not in ENDPOINTS[name]:
+                    ENDPOINTS[name].append(endpoint)
 
     ENVIRONMENT = e
 

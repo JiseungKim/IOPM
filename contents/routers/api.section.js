@@ -7,7 +7,10 @@ const section = new Section()
 
 router.get('/find_by_id/:sid', async_handler(async (req, res, next) => {
     try {
-        const sct = await section.find_by_id(req.params.sid)
+        const sct = await section.find(req.params.sid)
+        if (sct == null)
+            throw '섹션이 없습니다.'
+
         res.json({ success: true, section: sct })
     } catch (err) {
         console.log(err)
@@ -17,7 +20,7 @@ router.get('/find_by_id/:sid', async_handler(async (req, res, next) => {
 
 router.get('/find_by_project/:pid', async_handler(async (req, res, next) => {
     try {
-        const sct = await section.find_by_project(req.headers.uuid, req.params.pid)
+        const sct = await section.from_project(req.headers.id, req.params.pid)
         res.json({ success: true, sections: sct })
     } catch (err) {
         console.log(err)
@@ -28,7 +31,7 @@ router.get('/find_by_project/:pid', async_handler(async (req, res, next) => {
 // section 생성
 router.post('/make', async_handler(async (req, res, next) => {
     try {
-        const id = await section.add(req.body.name, req.headers.uuid, req.body.project)
+        const id = await section.add(req.body.name, req.headers.id, req.body.project)
         res.json({
             success: true, section: {
                 id: id,
@@ -42,12 +45,8 @@ router.post('/make', async_handler(async (req, res, next) => {
 
 router.post('/update/:sid', async_handler(async (req, res, next) => {
     try {
-        const success = await section.update(req.params.sid, req.body.user_id, req.body.user_id, req.body.project_id)
-
-        if (success == null)
-            throw "섹션 이름이 중복됩니다"
-
-        res.json({ success: success })
+        await section.update(req.params.sid, req.body.section, req.headers.id, req.body.project_id)
+        res.json({ success: true })
     } catch (err) {
         console.log(err)
         res.json({ success: false, error: err })
@@ -56,12 +55,8 @@ router.post('/update/:sid', async_handler(async (req, res, next) => {
 
 router.post('/remove/:sid', async_handler(async (req, res, next) => {
     try {
-        const success = await section.remove(req.params.sid, req.headers.uuid)
-
-        if (success == null)
-            throw "관리자가 아닙니다."
-
-        res.json({ success: success })
+        await section.remove(req.params.sid, req.headers.id)
+        res.json({ success: true })
     } catch (err) {
         console.log(err)
         res.json({ success: false, error: err })

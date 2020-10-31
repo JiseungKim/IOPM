@@ -17,7 +17,6 @@ app.use("/api/participation", require("./routers/api.participation"));
 app.use("/api/project", require("./routers/api.project"));
 app.use("/api/todo", require("./routers/api.todo"));
 
-
 app.listen(appsettings.common.port, () => {
     console.log(`listen to ${appsettings.common.port}..`);
 });

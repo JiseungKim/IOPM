@@ -8,7 +8,7 @@ const todo = new Todo()
 // todo 상세 정보
 router.get('/find_by_id/:tid', async_handler(async (req, res, next) => {
     try {
-        const td = await todo.find_by_id(req.params.tid)
+        const td = await todo.find(req.params.tid)
         res.json({ success: true, todo: td })
     } catch (err) {
         console.log(err)
@@ -31,8 +31,8 @@ router.get('/find_by_section/:sid', async_handler(async (req, res, next) => {
 // 특정 project에 속한 todo 찾기
 router.get('/find_by_project/:pname', async_handler(async (req, res, next) => {
     try {
-        const data = await todo.find_by_project(req.headers.uuid, req.params.pname)
-        res.json({ success: true, mine: data.mine, sections: data.sections })
+        const { sections, mine } = await todo.find_by_project(req.headers.id, req.params.pname)
+        res.json({ success: true, sections: sections, mine: mine })
     } catch (err) {
         console.log(err)
         res.json({ success: false, error: err })
@@ -41,25 +41,17 @@ router.get('/find_by_project/:pname', async_handler(async (req, res, next) => {
 
 router.post('/make', async_handler(async (req, res, next) => {
     try {
-        const tid = await todo.add(req.headers.uuid, req.body.section, req.body.title, req.body.desc)
-
-        if (tid == null)
-            throw "참여자가 아닙니다."
-
-        res.json({ success: true, todo: { id: tid, title: req.body.title, desc: req.body.desc } })
+        const created = await todo.add(req.headers.id, req.body.section, req.body.title, req.body.desc)
+        res.json({ success: true, todo: created })
     } catch (err) {
         console.log(err)
         res.json({ success: false, error: err })
     }
 }))
 
-router.post('/update/:tid', async_handler(async (req, res, next) => {
+router.post('/update/:id', async_handler(async (req, res, next) => {
     try {
-        const success = await todo.update(req.body.todo, req.params.tid, req.body.user_id)
-
-        if (success == null)
-            throw "관리자가 아닙니다."
-
+        await todo.update(req.body.todo, req.params.id, req.headers.id)
         res.json({ success: success })
     } catch (err) {
         console.log(err)
@@ -67,14 +59,10 @@ router.post('/update/:tid', async_handler(async (req, res, next) => {
     }
 }))
 
-router.post('/remove/:tid', async_handler(async (req, res, next) => {
+router.post('/remove/:id', async_handler(async (req, res, next) => {
     try {
-        const success = await todo.remove(req.params.tid, req.headers.uuid)
-
-        if (success == null)
-            throw "관리자가 아닙니다."
-
-        res.json({ success: success })
+        await todo.remove(req.params.id, req.headers.id)
+        res.json({ success: true })
     } catch (err) {
         console.log(err)
         res.json({ success: false, error: err })

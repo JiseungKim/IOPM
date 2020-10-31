@@ -4,14 +4,14 @@ const settings = require('../modules/config')
 
 class Participation {
     constructor() {
-        this._pool = mysql.createPool(settings.database)
+        this.$pool = mysql.createPool(settings.database)
     }
 
     async get_all() {
         let connection = null
 
         try {
-            connection = await this._pool.getConnection()
+            connection = await this.$pool.getConnection()
 
             const [rows] = await connection.query(`SELECT * FROM team`)
 
@@ -27,7 +27,7 @@ class Participation {
     async add(participation) {
         let connection = null
         try {
-            connection = await this._pool.getConnection()
+            connection = await this.$pool.getConnection()
 
             const [rows] = await connection.query(
                 `SELECT * FROM participation WHERE project_id=${participation.project_id} AND user_id=${participation.user_id}`
@@ -52,7 +52,7 @@ class Participation {
         let connection = null
 
         try {
-            connection = await this._pool.getConnection()
+            connection = await this.$pool.getConnection()
 
             const [result] = await connection.query(
                 `DELETE FROM participation WHERE user_id=${participation.user_id} AND project_id=${participation.project_id}`

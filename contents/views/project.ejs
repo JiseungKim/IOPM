@@ -26,17 +26,17 @@
                     <img src=<%= cdn("image/plus.png") %> />
                 </div>
                 <ul class="todo-list">
-                    <li class="todo-item" v-for="todo in section.todo_list">
+                    <li class="todo-item" v-for="todo in section.todos">
                         <div class="title">
                             <div>{{ todo.title }}</div>
-                            <img v-show='todo.mine' v-on:click='remove_todo(todo.tid)'
+                            <img v-show='todo.mine' v-on:click='remove_todo(todo.id)'
                                 src=<%= cdn("image/recycle_bin.png") %> />
                         </div>
                         <div class="desc">{{ todo.description }}</div>
                         <div class="responsibility">
-                            <img class="thumb" v-bind:src='todo.photo' />
+                            <img class="thumb" src=<%= cdn("image/tyrion.png") %> />
                             <div class="member-desc">
-                                <div class="name">{{ todo.owner }}</div>
+                                <div class="name">{{ todo.owner.email }}</div>
                                 <!-- <div class="desc">{{ todo.owner.desc }}</div> -->
                             </div>
                         </div>

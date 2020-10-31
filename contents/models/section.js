@@ -1,156 +1,126 @@
 
-const mysql = require('mysql2/promise')
-const settings = require('../modules/config')
+const context = require('./context')
+const { Op } = require('sequelize')
+const { sequelize } = require('./context')
 
 // TODO: 정규식
 
 class Project {
-    constructor() {
-        this._pool = mysql.createPool(settings.database)
-    }
 
-    async find_by_id(section_id) {
-        let connection = null
-
+    async find(id) {
         try {
-            connection = await this._pool.getConnection()
-
-            const [rows] = await connection.query(`SELECT * FROM section WHERE id=${section_id}`)
-
-            if (rows.length == 0)
-                return null
-
-            return rows[0]
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            return await context.sections.findOne({
+                where: { id: id },
+                include: [{ model: context.todos }]
+            })
+        } catch (e) {
+            console.error(e)
+            throw e
         }
     }
 
-    async find_by_project(uuid, project_id) {
-        let connection = null
-
+    async from_project(uid, pid) {
         try {
-            connection = await this._pool.getConnection()
+            const project = await context.projects.findOne({
+                where: { [Op.and]: [{ id: pid }, { owner: uid }] },
+                include: [{ model: context.sections }]
+            })
 
-            // 해당 유저의 프로젝트 참여 여부도 체크해야 하므로 JOIN 필요
-            const [rows] = await connection.query(
-                `
-                SELECT section.id, section.name FROM section
-                    LEFT JOIN user ON user.uuid='${uuid}'
-                    LEFT JOIN project ON project.name='${project_id}'
-                    LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
-                WHERE participation.id IS NOT NULL
-                ORDER BY section.created_date
-                `
-            )
-
-            return rows
+            return project.sections
         } catch (err) {
             throw err
-        } finally {
-            if (connection != null)
-                connection.release()
         }
     }
 
-    async add(name, uuid, project_name) {
-        let connection = null
+    async add(name, uid, pname) {
+        const t = await sequelize.transaction()
         try {
-            connection = await this._pool.getConnection()
+            const project = await context.projects.findOne({
+                where: { [Op.and]: [{ name: pname }, { owner: uid }] },
+                include: [{ model: context.sections, required: false }]
+            })
 
-            const [[user]] = await connection.query(
-                `SELECT id FROM user WHERE uuid='${uuid}' LIMIT 1`
-            )
-            if (user == null)
-                throw `invalid user id : ${uuid}`
-
-            const [[project]] = await connection.query(
-                `SELECT * FROM project WHERE owner=${user.id} AND name='${project_name}' LIMIT 1`
-            )
             if (project == null)
-                throw `cannot find any matched project, name : '${project_name}'.`
+                throw '권한이 없습니다.'
 
-            const [[exists]] = await connection.query(
-                `SELECT COUNT(*) AS count FROM section WHERE project_id=${project.id} AND name='${name}'`
-            )
-            if (exists.count > 0)
-                throw `'${name}' is already exists.`
+            for (const x of project.sections) {
+                if (x.name == name)
+                    throw '이미 존재합니다.'
+            }
 
-            const [result] = await connection.query(
-                `
-                INSERT INTO section(project_id, name, created_date) 
-                VALUES(${project.id}, '${name}', UTC_TIMESTAMP())
-                `
-            )
-            return result.insertId
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            const created = await context.sections.create({
+                project_id: project.id,
+                name: name
+            }, { transaction: t })
+
+            await t.commit()
+            return created.id
+        } catch (e) {
+            console.error(e)
+            t.rollback()
+            throw e
         }
     }
 
-    async update(section_id, section, user_id, project_id) {
-        let connection = null
+    async update(id, section, uid, pid) {
+
+        const t = await sequelize.transaction()
         try {
-            connection = await this._pool.getConnection()
 
-            // team의 관리자 찾기
-            const [project_owner] = await connection.query(
-                `SELECT owner FROM project WHERE id=${project_id}`
-            )
+            const project = await context.projects.findOne({
+                where: { id: pid },
+                include: [{ model: context.sections }]
+            }, { transaction: t })
 
-            if (project_owner[0].owner != user_id)
-                throw "관리자가 아닙니다."
+            if (project == null)
+                throw '프로젝트가 없습니다.'
 
-            // 섹션 이름 중복 검사
-            const [exists] = await connection.query(
-                `SELECT COUNT(*) AS count FROM section
-                WHERE NOT id=${section_id} AND name='${section.name}' AND project_id=${project_id}`
-            )
+            if (project.owner != uid)
+                throw '관리자가 아닙니다.'
 
-            if (exists[0].count > 0)
-                return null
+            if (project.sections.length == 0)
+                throw '섹션이 없습니다.'
 
-            const [result] = await this._pool.query(`UPDATE section SET name='${section.name}' WHERE id=${section_id}`)
+            for (const x of project.sections) {
+                if (x.id == id)
+                    continue
 
-            return result.affectedRows > 0
+                if (x.name == section.name)
+                    throw '이미 존재하는 이름입니다.'
+            }
 
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            await context.sections.update({
+                name: section.name
+            }, {
+                where: { id: id }
+            }, { transaction: t })
+
+            await t.commit()
+            return updated
+        } catch (e) {
+            console.error(e)
+            throw e
         }
     }
 
-    async remove(section_id, user_id) {
-        let connection = null
-
+    async remove(id, uid) {
+        const t = await sequelize.transaction()
         try {
-            connection = await this._pool.getConnection()
-            const [result] = await connection.query(
-                `
-                DELETE section FROM section
-                    LEFT JOIN user ON user.uuid='${user_id}'
-                    LEFT JOIN project ON project.id=section.project_id
-                    LEFT JOIN participation ON participation.user_id=user.id AND participation.project_id=project.id
-                WHERE 
-                    section.id=${section_id} AND 
-                    project.owner=user.id
-                `
-            )
 
-            return result.affectedRows > 0
-        } catch (err) {
-            throw err
-        } finally {
-            if (connection != null)
-                connection.release()
+            const project = await context.projects.findOne({
+                where: { owner: uid },
+                include: [{ model: context.sections, where: { id: id } }]
+            }, { transaction: t })
+
+            if (project == null)
+                throw '권한이 없습니다.'
+
+            await context.sections.destroy({ where: { id: id } }, { transaction: t })
+            await t.commit()
+
+        } catch (e) {
+            console.error(e)
+            throw e
         }
     }
 }

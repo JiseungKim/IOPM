@@ -19,8 +19,8 @@ router.post(
             if (result.error)
                 throw result.error
 
-            res.cookie("access_token", result.access_token, { httpOnly: true })
-            res.cookie("refresh_token", result.refresh_token, { httpOnly: true })
+            res.cookie("access_token", result.token.access, { httpOnly: true })
+            res.cookie("refresh_token", result.token.refresh, { httpOnly: true })
             res.cookie('name', result.user.name)
             res.cookie('email', result.user.email)
             res.cookie('photo', result.user.photo)
@@ -28,7 +28,7 @@ router.post(
             res.json({
                 success: true,
                 uuid: result.uuid,
-                tokens: { access: result.access_token, refresh: result.refresh_token },
+                tokens: result.token,
             })
         } catch (err) {
             console.error(err)
